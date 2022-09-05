@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+    environment:
+      - AWS_DEFAULT_REGION=eu-central-1
+      - EDGE_PORT=4566
+      - SERVICES=dynamodb
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - PERSISTENCE=${PERSISTENCE-}
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+#      - './.localstack:/tmp/localstack'
+      - "/var/run/docker.sock:/var/run/docker.sock"
