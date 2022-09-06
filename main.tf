@@ -15,40 +15,66 @@ provider "aws" {
 }
 
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name           = "GameScores"
+  name           = "main_table"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
-  hash_key       = "CV_id"
+  hash_key       = "cv_id"
+  range_key      = "last_name"
 
   attribute {
-    name = "CV_id"
+    name = "cv_id"
     type = "S"
   }
 
   attribute {
-    name = "GameTitle"
+    name = "last_name"
     type = "S"
   }
 
   attribute {
-    name = "TopScore"
+    name = "first_name"
+    type = "S"
+  }
+
+  attribute {
+    name = "age"
     type = "N"
   }
 
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
+attribute {
+    name = "major"
+    type = "S"
   }
 
-  global_secondary_index {
-    name               = "GameTitleIndex"
-    hash_key           = "GameTitle"
-    range_key          = "TopScore"
-    write_capacity     = 10
-    read_capacity      = 10
-    projection_type    = "INCLUDE"
-    non_key_attributes = ["UserId"]
+  attribute {
+    name = "skills"
+    type = "SS"
+  }
+
+  attribute {
+    name = "years_of_exp"
+    type = "N"
+  }
+
+  attribute {
+    name = "phone_number"
+    type = "S"
+  }
+
+  attribute {
+    name = "projects"
+    type = "SS"
+  }
+
+  attribute {
+    name = "project_amount"
+    type = "N"
+  }
+
+  attribute {
+    name = "cv_in_bytes"
+    type = "B"
   }
 
   tags = {
