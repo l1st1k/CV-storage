@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+
+
+__all__ = ('CVCreate', 'CVInsertIntoDB', 'CVShortRead', 'CVsRead')
 
 
 class CVFields:
@@ -58,8 +61,8 @@ class CVCreate(BaseModel):
     major: str = CVFields.major
     years_of_exp: int = CVFields.years_of_exp
     phone_number: str = CVFields.phone_number
-    skills: list[str] = CVFields.skills
-    projects: Optional[list[str]] = CVFields.projects
+    skills: str = CVFields.skills
+    projects: Optional[str] = CVFields.projects
 
 
 class CVInsertIntoDB(CVCreate):
@@ -67,3 +70,31 @@ class CVInsertIntoDB(CVCreate):
     cv_id: str = CVFields.cv_id
     project_amount: int = CVFields.project_amount
     cv_in_bytes: bytes = CVFields.cv_in_bytes
+
+
+class CVShortRead(BaseModel):
+    """Body of CV 'GET' list requests"""
+    cv_id: str = CVFields.cv_id
+    first_name: str = CVFields.first_name
+    last_name: str = CVFields.last_name
+    age: int = CVFields.age
+    major: str = CVFields.major
+    years_of_exp: int = CVFields.years_of_exp
+
+
+CVsRead = List[CVShortRead]
+
+
+TEMP_INTO_DB_MODEL = CVInsertIntoDB(
+    first_name='dfgfdgpjhgga',
+    last_name='ukoghjrksdgsdin',
+    age=18,
+    major='pilot',
+    years_of_exp=45,
+    phone_number='+375295648826',
+    skills='c++',
+    projects='web, finance',
+    cv_id='3445b448-2460-4fd2-9183-8450de6f8343',
+    project_amount=2,
+    cv_in_bytes=bytes(b'eurtikwetwet')
+)
