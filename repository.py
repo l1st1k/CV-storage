@@ -1,9 +1,5 @@
 from database import db_table
-from models import (CVCreate,
-                    CVInsertIntoDB,
-                    CVsRead,
-                    CVShortRead)
-
+from models import CVCreate, CVInsertIntoDB, CVShortRead, CVsRead
 
 __all__ = ('CVRepository',)
 

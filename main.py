@@ -1,10 +1,8 @@
 from fastapi import FastAPI
-from database import db_table
-from models import (CVCreate,
-                    CVInsertIntoDB,
-                    CVsRead)
-from repository import CVRepository
 
+from database import db_table
+from models import CVCreate, CVInsertIntoDB, CVsRead
+from repository import CVRepository
 
 app = FastAPI()
 
