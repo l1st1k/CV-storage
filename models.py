@@ -1,8 +1,8 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field
 
-__all__ = ('CVCreate', 'CVInsertIntoDB', 'CVShortRead', 'CVsRead')
+__all__ = ('CVCreate', 'CVInsertIntoDB', 'CVShortRead', 'CVsRead', 'CVFullRead')
 
 
 class CVFields:
@@ -83,6 +83,20 @@ class CVShortRead(BaseModel):
 
 
 CVsRead = List[CVShortRead]
+
+
+class CVFullRead(BaseModel):
+    """Body of CV GET requests"""
+    cv_id: str = CVFields.cv_id
+    first_name: str = CVFields.first_name
+    last_name: str = CVFields.last_name
+    age: int = CVFields.age
+    major: str = CVFields.major
+    years_of_exp: int = CVFields.years_of_exp
+    phone_number: str = CVFields.phone_number
+    skills: Union[str, List[str]] = CVFields.skills
+    projects: Union[Optional[str], Optional[List[str]]] = CVFields.projects
+    project_amount: int = CVFields.project_amount
 
 
 TEMP_INTO_DB_MODEL = CVInsertIntoDB(
