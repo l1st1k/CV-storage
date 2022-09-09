@@ -1,34 +1,24 @@
 import csv
-from models import TEMP_INTO_DB_MODEL, CVInsertIntoDB
+from models import CVInsertIntoDB, CVShortRead, CVFullRead
 
 
-def temp_func():
-    with open('example_csv/person1.csv', newline='') as csvfile:
-        a = csv.reader(csvfile, delimiter=',', quotechar='|')
-        print(type(a))
-        for row in a:
-            print(row)
+def model_to_csv(model) -> None:
+    cv_dict = dict(model)
+    with open('temp.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(cv_dict.items())
 
 
-def inp(obj):
-    with open('names.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile,
-                                fieldnames=list(CVInsertIntoDB.schema()["properties"].keys()))
-        writer.writeheader()
-        for k, v in obj:
-            writer.writerow({k: v})
+def csv_to_model(full: bool) -> CVFullRead or CVShortRead:
+    cv_dict = dict()
+    with open('temp.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in reader:
+            cv_dict.update({row[0]: row[1]})
 
-
-def out():
-    fieldnames = list(CVInsertIntoDB.schema()["properties"].keys())
-    with open('names.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        cv_dict = {}
-        for row, field in zip(reader, fieldnames):
-            cv_dict[field] = row[field]
-        model = CVInsertIntoDB(**cv_dict)
-        print(model)
-
-
-# inp(TEMP_INTO_DB_MODEL)
-out()
+    # Model choice
+    if full:
+        model = CVFullRead(**cv_dict)
+    else:
+        model = CVShortRead(**cv_dict)
+    return model
