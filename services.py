@@ -1,11 +1,16 @@
 import csv
 import base64
 import os
-
+import logging
+import sys
 from glob import glob
 from uuid import uuid4
 from models import CVInsertIntoDB, CVShortRead, CVFullRead
 from typing import Union, Type
+
+
+#  Settings
+logging.basicConfig(level=logging.INFO)
 
 
 def model_to_csv(model) -> None:
@@ -43,7 +48,14 @@ def b64_to_local_csv(title: str, b64_str: bytes) -> None:
 
 def clear_csv() -> None:
     """Deletes all local .csv"""
-
     removing_files = glob('./*.csv')
     for i in removing_files:
         os.remove(i)
+    logging.info("ALL LOCAL .csv ARE CLEARED SUCCESSFULLY!")
+
+
+def b64_to_file(b64_str: bytes) -> None:
+    image_64_decode = base64.b64decode(b64_str)
+    # create a writable image and write the decoding result
+    image_result = open('temp.csv', 'wb')
+    image_result.write(image_64_decode)

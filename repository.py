@@ -2,8 +2,9 @@ from boto3.dynamodb.conditions import Key
 from fastapi.responses import JSONResponse
 from fastapi import UploadFile, status
 from database import db_table
-from models import CVCreate, CVInsertIntoDB, CVShortRead, CVsRead, CVFullRead
+from models import *
 from services import *
+import base64
 
 __all__ = ('CVRepository',)
 
@@ -28,20 +29,28 @@ class CVRepository:
             # Type check
             if file and (file.content_type != 'text/csv'):
                 raise TypeError
+            logging.info(f"New CV received: {file.filename}")
 
-            # TODO Write local csv
+            # .csv into base 64
+            encoded_string: bytes = base64.b64encode(file.file.read())
 
-            # TODO .csv -> model; .csv into base 64
-            model = CVInsertIntoDB()
+            # Writing local .csv
+            b64_to_file(encoded_string)
 
-            # TODO Deleting temp.csv
+            # Reading .csv into model
+            model = csv_to_read_model(response_class=CVInsertIntoDB)
+            model.cv_id = get_uuid()
+            model.cv_in_bytes = encoded_string
+
+            # Deleting local .csv
+            clear_csv()
 
             # TODO Database logic
 
             # Response
             response = JSONResponse(
                 content={"message": f"New CV uploaded successfully!",
-                         "id": model.cv_id},
+                         "cv_id": model.cv_id},
                 status_code=status.HTTP_201_CREATED)
         except TypeError:
             response = JSONResponse(

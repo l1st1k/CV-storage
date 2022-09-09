@@ -10,7 +10,8 @@ class CVFields:
         description="Unique identifier of this CV in the database",
         example="3422b448-2460-4fd2-9183-8000de6f8343",
         min_length=36,
-        max_length=36
+        max_length=36,
+        default=None
     )
     first_name = Field(
         description="First name",
@@ -49,7 +50,8 @@ class CVFields:
         example=2
     )
     cv_in_bytes = Field(
-        description='CV file by itself encoded into base64'
+        description='CV file by itself encoded into base64',
+        default=None
     )
 
 
@@ -63,12 +65,12 @@ class CVCreate(BaseModel):
     phone_number: str = CVFields.phone_number
     skills: str = CVFields.skills
     projects: Optional[str] = CVFields.projects
+    project_amount: Optional[int] = CVFields.project_amount
 
 
 class CVInsertIntoDB(CVCreate):
     """Model to insert into database"""
     cv_id: str = CVFields.cv_id
-    project_amount: int = CVFields.project_amount
     cv_in_bytes: bytes = CVFields.cv_in_bytes
 
 
