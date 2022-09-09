@@ -1,8 +1,7 @@
 from fastapi import FastAPI, UploadFile, status
 from fastapi.responses import JSONResponse
 
-from database import db_table
-from models import CVCreate, CVInsertIntoDB, CVsRead, CVFullRead
+from models import CVCreate, CVFullRead, CVInsertIntoDB, CVsRead
 from repository import CVRepository
 
 app = FastAPI()
@@ -42,6 +41,3 @@ def _get_cv(cv_id: str):
 )
 def _post_cv(file: UploadFile):
     return CVRepository.create(file=file)
-
-# db_table.put_item(Item=dict(TEMP_INTO_DB_MODEL))
-# response = db_table.scan()

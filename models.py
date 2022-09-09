@@ -2,7 +2,13 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field
 
-__all__ = ('CVCreate', 'CVInsertIntoDB', 'CVShortRead', 'CVsRead', 'CVFullRead')
+__all__ = (
+    'CVCreate',
+    'CVInsertIntoDB',
+    'CVShortRead',
+    'CVsRead',
+    'CVFullRead'
+)
 
 
 class CVFields:

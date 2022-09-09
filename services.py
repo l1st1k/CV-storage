@@ -1,12 +1,21 @@
-import csv
 import base64
-import os
+import csv
 import logging
-import sys
+import os
 from glob import glob
+from typing import Type, Union
 from uuid import uuid4
-from models import CVInsertIntoDB, CVShortRead, CVFullRead
-from typing import Union, Type
+
+from models import CVFullRead, CVInsertIntoDB, CVShortRead
+
+__all__ = (
+    'model_to_csv',
+    'csv_to_model',
+    'get_uuid',
+    'b64_to_local_csv',
+    'clear_csv',
+    'b64_to_file'
+)
 
 
 #  Settings
@@ -20,7 +29,7 @@ def model_to_csv(model) -> None:
         writer.writerows(cv_dict.items())
 
 
-def csv_to_read_model(
+def csv_to_model(
         response_class: Union[Type[CVFullRead], Type[CVShortRead], Type[CVInsertIntoDB]]
 ) -> Union[CVFullRead, CVShortRead, CVInsertIntoDB]:
     cv_dict = dict()
