@@ -1,13 +1,43 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, status
+from fastapi.responses import JSONResponse
+
+from models import CVCreate, CVFullRead, CVInsertIntoDB, CVsRead
+from repository import CVRepository
 
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get(
+    "/cvs",
+    response_model=CVsRead,
+    description="List all the CVs",
+    tags=[
+        "CVs"
+    ]
+)
+def _list_cvs():
+    return CVRepository.list()
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.get(
+    "/cv/{cv_id}",
+    response_model=CVFullRead,
+    description="Retrieve CV by ID",
+    tags=[
+        "CV"
+    ]
+)
+def _get_cv(cv_id: str):
+    return CVRepository.get(cv_id=cv_id)
+
+
+@app.post(
+    "/cv",
+    response_class=JSONResponse,
+    description='Upload CV in .csv',
+    tags=[
+        "CV"
+    ]
+)
+def _post_cv(file: UploadFile):
+    return CVRepository.create(file=file)
