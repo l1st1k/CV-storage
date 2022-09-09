@@ -53,12 +53,16 @@ class CVRepository:
 
             # Response
             response = JSONResponse(
-                content={"message": f"New CV uploaded successfully!",
-                         "cv_id": model.cv_id},
+                content={
+                    "message": f"New CV uploaded successfully!",
+                    "cv_id": model.cv_id
+                },
                 status_code=status.HTTP_201_CREATED)
         except TypeError:
             response = JSONResponse(
-                content={"message": "CV should be in .csv format!"},
+                content={
+                    "message": "CV should be in .csv format!"
+                },
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
             )
         return response

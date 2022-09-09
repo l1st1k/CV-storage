@@ -105,18 +105,3 @@ class CVFullRead(BaseModel):
     skills: Union[str, List[str]] = CVFields.skills
     projects: Union[Optional[str], Optional[List[str]]] = CVFields.projects
     project_amount: int = CVFields.project_amount
-
-
-TEMP_INTO_DB_MODEL = CVInsertIntoDB(
-    first_name='dfgfdgpjhgga',
-    last_name='ukoghjrksdgsdin',
-    age=18,
-    major='pilot',
-    years_of_exp=45,
-    phone_number='+375295648826',
-    skills='c++',
-    projects='web, finance',
-    cv_id='3445b448-2460-4fd2-9183-8450de6f8343',
-    project_amount=2,
-    cv_in_bytes=bytes(b'eurtikwetwet')
-)
