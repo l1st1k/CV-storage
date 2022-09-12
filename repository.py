@@ -69,9 +69,10 @@ class CVRepository:
 
     @staticmethod
     def update(cv_id: str, data: CVUpdate) -> CVFullRead:
+        update_item_attrs(cv_id, data)
         response = db_table.query(KeyConditionExpression=Key('cv_id').eq(cv_id))
         # TODO 404 Not Found
+        # TODO .csv restructuring
         document = response['Items'][0]
         model = CVFullRead(**document)
-
-        return updated_model
+        return model

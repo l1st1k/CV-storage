@@ -41,3 +41,18 @@ def _get_cv(cv_id: str):
 )
 def _post_cv(file: UploadFile):
     return CVRepository.create(file=file)
+
+
+@app.patch(
+    "/cv/{cv_id}",
+    response_model=CVFullRead,
+    description="Updates CV by ID",
+    tags=[
+        "CV"
+    ]
+)
+def _update_cv(cv_id: str, model: CVUpdate):
+    return CVRepository.update(cv_id=cv_id, data=model)
+
+
+# TODO get for .csv files
