@@ -66,3 +66,12 @@ class CVRepository:
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
             )
         return response
+
+    @staticmethod
+    def update(cv_id: str, data: CVUpdate) -> CVFullRead:
+        response = db_table.query(KeyConditionExpression=Key('cv_id').eq(cv_id))
+        # TODO 404 Not Found
+        document = response['Items'][0]
+        model = CVFullRead(**document)
+
+        return updated_model

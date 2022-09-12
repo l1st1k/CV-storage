@@ -4,15 +4,9 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "cv_id"
-  range_key      = "last_name"
 
   attribute {
     name = "cv_id"
-    type = "S"
-  }
-
-  attribute {
-    name = "last_name"
     type = "S"
   }
 

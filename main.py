@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, status
 from fastapi.responses import JSONResponse
 
-from models import CVCreate, CVFullRead, CVInsertIntoDB, CVsRead
+from models import CVUpdate, CVFullRead, CVInsertIntoDB, CVsRead
 from repository import CVRepository
 
 app = FastAPI()
