@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from models import CVUpdate, CVFullRead, CVInsertIntoDB, CVsRead
 from repository import CVRepository
@@ -55,4 +55,13 @@ def _update_cv(cv_id: str, model: CVUpdate):
     return CVRepository.update(cv_id=cv_id, data=model)
 
 
-# TODO get for .csv files
+@app.get(
+    "/cv/{cv_id}/csv",
+    response_class=FileResponse,
+    description='Returns CV in .csv file',
+    tags=[
+        "CV"
+    ]
+)
+def _get_csv(cv_id: str):
+    return CVRepository.get_csv(cv_id=cv_id)

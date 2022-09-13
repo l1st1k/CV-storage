@@ -65,10 +65,9 @@ def clear_csv() -> None:
     logging.info("ALL LOCAL .csv ARE CLEARED SUCCESSFULLY!")
 
 
-def b64_to_file(b64_str: bytes) -> None:
+def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> None:
     image_64_decode = base64.b64decode(b64_str)
-    # create a writable image and write the decoding result
-    image_result = open('temp.csv', 'wb')
+    image_result = open(title, 'wb')
     image_result.write(image_64_decode)
 
 

@@ -3,7 +3,7 @@ from base64 import b64encode
 
 from boto3.dynamodb.conditions import Key
 from fastapi import UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from database import db_table
 from models import *
@@ -20,9 +20,13 @@ class CVRepository:
 
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
-        response = db_table.query(KeyConditionExpression=Key('cv_id').eq(cv_id))
         # TODO 404 Not Found
-        document = response['Items'][0]
+        response = db_table.get_item(
+            Key={
+                'cv_id': cv_id
+            }
+        )
+        document = response['Item']
         return CVFullRead(**document)
 
     @staticmethod
@@ -76,3 +80,23 @@ class CVRepository:
         document = response['Items'][0]
         model = CVFullRead(**document)
         return model
+
+    @staticmethod
+    def get_csv(cv_id: str) -> FileResponse:
+        # Querying from DB
+        document = db_table.get_item(
+            Key={
+                'cv_id': cv_id
+            },
+            AttributesToGet=[
+                'last_name', 'cv_in_bytes'
+            ]
+        )
+        title: str = document['Item']['last_name'] + '.csv'
+        cv_in_bytes: bytes = document['Item']['cv_in_bytes']
+
+        # Writing local .csv
+        b64_to_file(bytes(cv_in_bytes), title=title)
+
+        # Response (as a '.csv' file)
+        return FileResponse(title)
