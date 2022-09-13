@@ -1,9 +1,8 @@
 import logging
 from base64 import b64encode
 
-from boto3.dynamodb.conditions import Key
 from fastapi import UploadFile, status
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from database import db_table
 from models import *

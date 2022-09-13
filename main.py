@@ -1,9 +1,7 @@
-from typing import Type
-
 from fastapi import FastAPI, UploadFile, status
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
-from models import CVUpdate, CVFullRead, CVInsertIntoDB, CVsRead
+from models import CVFullRead, CVInsertIntoDB, CVsRead, CVUpdate
 from repository import CVRepository
 
 app = FastAPI()
