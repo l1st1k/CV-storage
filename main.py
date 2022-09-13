@@ -1,3 +1,5 @@
+from typing import Type
+
 from fastapi import FastAPI, UploadFile, status
 from fastapi.responses import JSONResponse, FileResponse
 

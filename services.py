@@ -16,7 +16,8 @@ __all__ = (
     'b64_to_local_csv',
     'clear_csv',
     'b64_to_file',
-    'update_item_attrs'
+    'update_item_attrs',
+    'update_encoded_string',
 )
 
 
@@ -24,9 +25,10 @@ __all__ = (
 logging.basicConfig(level=logging.INFO)
 
 
-def model_to_csv(model) -> None:
+def model_to_csv(model: CVFullRead) -> None:
     cv_dict = dict(model)
-    with open('temp.csv', 'w', newline='') as csvfile:
+    title = model.last_name + '.csv'
+    with open(title, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(cv_dict.items())
 
@@ -88,5 +90,14 @@ def update_item_attrs(cv_id: str, model: CVUpdate):
         Key={'cv_id': cv_id},
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values
+    )
+    return response
+
+
+def update_encoded_string(cv_id: str, encoded_string: bytes):
+    response = db_table.update_item(
+        Key={'cv_id': cv_id},
+        UpdateExpression=f'set cv_in_bytes = :cv_in_bytes',
+        ExpressionAttributeValues={':cv_in_bytes': encoded_string}
     )
     return response

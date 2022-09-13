@@ -71,14 +71,23 @@ class CVRepository:
             )
         return response
 
-    @staticmethod
-    def update(cv_id: str, data: CVUpdate) -> CVFullRead:
+    @classmethod
+    def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
+        # Updating model's fields
         update_item_attrs(cv_id, data)
-        response = db_table.query(KeyConditionExpression=Key('cv_id').eq(cv_id))
-        # TODO 404 Not Found
-        # TODO .csv restructuring
-        document = response['Items'][0]
-        model = CVFullRead(**document)
+
+        # Updating .csv file
+        model: CVFullRead = cls.get(cv_id)
+        model_to_csv(model)
+        filename = model.last_name + '.csv'
+        with open(filename, "rb") as file:
+            encoded_string = b64encode(file.read())
+        update_encoded_string(cv_id=cv_id, encoded_string=encoded_string)
+
+        # Deleting local .csv
+        clear_csv()
+
+        # Responding with the full model of updated items
         return model
 
     @staticmethod
