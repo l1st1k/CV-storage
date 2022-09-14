@@ -1,10 +1,16 @@
-from fastapi import FastAPI, UploadFile, status
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from models import CVFullRead, CVInsertIntoDB, CVsRead, CVUpdate
+from models import CVFullRead, CVsRead, CVUpdate
 from repository import CVRepository
 
 app = FastAPI()
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
 @app.get(
@@ -65,3 +71,15 @@ def _update_cv(cv_id: str, model: CVUpdate):
 )
 def _get_csv(cv_id: str):
     return CVRepository.get_csv(cv_id=cv_id)
+
+
+@app.delete(
+    "/cv/{cv_id}",
+    response_class=JSONResponse,
+    description='Deletes CV from database',
+    tags=[
+        "CV"
+    ]
+)
+def _delete_csv(cv_id: str):
+    return CVRepository.delete(cv_id=cv_id)

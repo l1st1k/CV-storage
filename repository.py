@@ -1,7 +1,7 @@
 import logging
 from base64 import b64encode
 
-from fastapi import UploadFile, status
+from fastapi import HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 
 from database import db_table
@@ -15,16 +15,31 @@ class CVRepository:
     @staticmethod
     def list() -> CVsRead:
         response = db_table.scan()
+
+        # Empty DB validation
+        if len(response['Items']) == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="There is no any CV's in database."
+            )
+
         return [CVShortRead(**document) for document in response['Items']]
 
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
-        # TODO 404 Not Found
         response = db_table.get_item(
             Key={
                 'cv_id': cv_id
             }
         )
+
+        # 404 validation
+        if 'Item' not in response:
+            raise HTTPException(
+                status_code=404,
+                detail='CV not found.'
+            )
+
         document = response['Item']
         return CVFullRead(**document)
 
@@ -100,6 +115,15 @@ class CVRepository:
                 'last_name', 'cv_in_bytes'
             ]
         )
+
+        # 404 validation
+        if 'Item' not in document:
+            raise HTTPException(
+                status_code=404,
+                detail='CV not found.'
+            )
+
+        # Taking data from response
         title: str = document['Item']['last_name'] + '.csv'
         cv_in_bytes: bytes = document['Item']['cv_in_bytes']
 
@@ -108,3 +132,26 @@ class CVRepository:
 
         # Response (as a '.csv' file)
         return FileResponse(title)
+
+    @staticmethod
+    def delete(cv_id: str) -> JSONResponse:
+        # Querying from DB
+        db_response = db_table.delete_item(
+            Key={
+                'cv_id': cv_id
+            }
+        )
+
+        # 404 validation
+        if 'ConsumedCapacity' in db_response:
+            raise HTTPException(
+                status_code=404,
+                detail='CV not found.'
+            )
+
+        # Response
+        response = JSONResponse(
+                content="CV successfully deleted!",
+                status_code=status.HTTP_200_OK
+            )
+        return response
