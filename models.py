@@ -7,7 +7,8 @@ __all__ = (
     'CVInsertIntoDB',
     'CVShortRead',
     'CVsRead',
-    'CVFullRead'
+    'CVFullRead',
+    'CVsFullRead',
 )
 
 
@@ -112,3 +113,6 @@ class CVFullRead(BaseModel):
     skills: Union[str, List[str]] = CVFields.skills
     projects: Union[Optional[str], Optional[List[str]]] = CVFields.projects
     project_amount: int = CVFields.project_amount
+
+
+CVsFullRead = List[CVFullRead]

@@ -6,6 +6,8 @@ from glob import glob
 from typing import Type, Union
 from uuid import uuid4
 
+from fastapi import HTTPException
+
 from database import db_table
 from models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 
@@ -18,6 +20,8 @@ __all__ = (
     'b64_to_file',
     'update_item_attrs',
     'update_encoded_string',
+    'check_for_404',
+    'check_for_404_with_item',
 )
 
 
@@ -101,3 +105,19 @@ def update_encoded_string(cv_id: str, encoded_string: bytes):
         ExpressionAttributeValues={':cv_in_bytes': encoded_string}
     )
     return response
+
+
+def check_for_404(container, message: str = "Item can't be found!"):
+    if len(container) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail=message
+        )
+
+
+def check_for_404_with_item(container, item, message: str = "Item can't be found!"):
+    if item not in container:
+        raise HTTPException(
+            status_code=404,
+            detail=message
+        )

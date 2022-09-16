@@ -14,14 +14,11 @@ __all__ = ('CVRepository',)
 class CVRepository:
     @staticmethod
     def list() -> CVsRead:
+        # Scanning DB
         response = db_table.scan()
 
         # Empty DB validation
-        if len(response['Items']) == 0:
-            raise HTTPException(
-                status_code=404,
-                detail="There is no any CV's in database."
-            )
+        check_for_404(response['Items'], message="There is no any CV's in database.")
 
         return [CVShortRead(**document) for document in response['Items']]
 
@@ -34,11 +31,11 @@ class CVRepository:
         )
 
         # 404 validation
-        if 'Item' not in response:
-            raise HTTPException(
-                status_code=404,
-                detail='CV not found.'
-            )
+        check_for_404_with_item(
+            container=response,
+            item='Item',
+            message='CV not found.'
+        )
 
         document = response['Item']
         return CVFullRead(**document)
@@ -117,11 +114,11 @@ class CVRepository:
         )
 
         # 404 validation
-        if 'Item' not in document:
-            raise HTTPException(
-                status_code=404,
-                detail='CV not found.'
-            )
+        check_for_404_with_item(
+            container=document,
+            item='Item',
+            message='CV not found.'
+        )
 
         # Taking data from response
         title: str = document['Item']['last_name'] + '.csv'
@@ -155,3 +152,26 @@ class CVRepository:
                 status_code=status.HTTP_200_OK
             )
         return response
+
+    @staticmethod
+    def search(skill: str, last_name: str, major: str) -> CVsFullRead:
+        response_from_db = db_table.scan()
+
+        # Empty DB validation
+        check_for_404(response_from_db['Items'], message="There is no any CV's in database!")
+
+        # Taking list of items from db_response
+        scan_result = [CVFullRead(**document) for document in response_from_db['Items']]
+
+        # Filtering
+        result = [
+                item for item in scan_result
+                if (skill in item.skills.lower())
+                and (last_name in item.last_name.lower())
+                and (major in item.major.lower())
+                ]
+
+        # Empty result list validation
+        check_for_404(result, message="No matches found!")
+
+        return result

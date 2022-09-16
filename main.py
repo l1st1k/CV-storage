@@ -1,8 +1,8 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, Query
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from models import CVFullRead, CVsRead, CVUpdate
+from models import CVFullRead, CVsRead, CVUpdate, CVsFullRead
 from repository import CVRepository
 
 app = FastAPI()
@@ -83,3 +83,22 @@ def _get_csv(cv_id: str):
 )
 def _delete_csv(cv_id: str):
     return CVRepository.delete(cv_id=cv_id)
+
+
+@app.get(
+    "/cvs/search",
+    response_model=CVsFullRead,
+    description='Searches for CV with necessary skills',
+    tags=[
+        "CVs"
+    ]
+)
+def _search_cvs(
+        skill: str = Query(default=''),
+        last_name: str = Query(default='', max_length=25),
+        major: str = Query(default='', max_length=25)
+):
+    skill = skill.lower()
+    last_name = last_name.lower()
+    major = major.lower()
+    return CVRepository.search(skill=skill, last_name=last_name, major=major)
