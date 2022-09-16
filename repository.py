@@ -8,7 +8,9 @@ from database import db_table
 from models import *
 from services import *
 
-__all__ = ('CVRepository',)
+__all__ = (
+    'CVRepository',
+)
 
 
 class CVRepository:
@@ -87,9 +89,13 @@ class CVRepository:
         # Updating model's fields
         update_item_attrs(cv_id, data)
 
-        # Updating .csv file
+        # Taking updated attrs in model
         model: CVFullRead = cls.get(cv_id)
+
+        # Writing local .csv with updated attrs
         model_to_csv(model)
+
+        # Reading .csv into base64
         filename = model.last_name + '.csv'
         with open(filename, "rb") as file:
             encoded_string = b64encode(file.read())

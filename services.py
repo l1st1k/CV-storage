@@ -15,7 +15,6 @@ __all__ = (
     'model_to_csv',
     'csv_to_model',
     'get_uuid',
-    'b64_to_local_csv',
     'clear_csv',
     'b64_to_file',
     'update_item_attrs',
@@ -30,6 +29,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def model_to_csv(model: CVFullRead) -> None:
+    """Writes local .csv file from model"""
     cv_dict = dict(model)
     title = model.last_name + '.csv'
     with open(title, 'w', newline='') as csvfile:
@@ -40,6 +40,7 @@ def model_to_csv(model: CVFullRead) -> None:
 def csv_to_model(
         response_class: Union[Type[CVFullRead], Type[CVShortRead], Type[CVInsertIntoDB]]
 ) -> Union[CVFullRead, CVShortRead, CVInsertIntoDB]:
+    """Turns .csv into necessary model"""
     cv_dict = dict()
     with open('temp.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
@@ -56,49 +57,58 @@ def get_uuid() -> str:
     return str(uuid4())
 
 
-def b64_to_local_csv(title: str, b64_str: bytes) -> None:
-    image_64_decode = base64.b64decode(b64_str)
-    # create a writable image and write the decoding result
-    image_result = open(title, 'wb')
-    image_result.write(image_64_decode)
-
-
 def clear_csv() -> None:
     """Deletes all local .csv"""
+    # Taking filenames
     removing_files = glob('./*.csv')
+
+    # Removing files
     for i in removing_files:
         os.remove(i)
+
+    # Logging the action
     logging.info("ALL LOCAL .csv ARE CLEARED SUCCESSFULLY!")
 
 
 def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> None:
+    """"Writes local .csv file from base64 string"""
+    # Decoding base64
     image_64_decode = base64.b64decode(b64_str)
+
+    # Creates a writable image and writes the decoded result
     image_result = open(title, 'wb')
     image_result.write(image_64_decode)
 
 
 def update_item_attrs(cv_id: str, model: CVUpdate):
-    # Init expressions
+    """Updates items attrs"""
+    # Init expressions for DynamoDB update
     update_expression = "set"
     expression_attribute_values = {}
     attributes = model.dict()
+
+    # Filling the expressions
     for key, value in attributes.items():
         if value:
             update_expression += f' {key} = :{key},'
             expression_attribute_values[f':{key}'] = value
 
-    #   Cutting the last comma
+    # Cutting the last comma
     update_expression = update_expression[:-1]
 
+    # Querying the update to DynamoDB
     response = db_table.update_item(
         Key={'cv_id': cv_id},
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values
     )
+
     return response
 
 
 def update_encoded_string(cv_id: str, encoded_string: bytes):
+    """Updates single attr (encoded_string)"""
+    # Querying the update to DynamoDB
     response = db_table.update_item(
         Key={'cv_id': cv_id},
         UpdateExpression=f'set cv_in_bytes = :cv_in_bytes',
@@ -108,6 +118,7 @@ def update_encoded_string(cv_id: str, encoded_string: bytes):
 
 
 def check_for_404(container, message: str = "Item can't be found!"):
+    """Checks container for 'empty' case"""
     if len(container) == 0:
         raise HTTPException(
             status_code=404,
@@ -116,6 +127,10 @@ def check_for_404(container, message: str = "Item can't be found!"):
 
 
 def check_for_404_with_item(container, item, message: str = "Item can't be found!"):
+    """
+    Checks response for 'empty' case
+    Used only for checking responses of .get_item() function
+    """
     if item not in container:
         raise HTTPException(
             status_code=404,

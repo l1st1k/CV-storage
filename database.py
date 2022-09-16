@@ -1,7 +1,9 @@
 import boto3
 from dotenv import dotenv_values
 
-__all__ = ('db_table',)
+__all__ = (
+    'db_table',
+)
 
 # Env variables
 config = dotenv_values(".env")
