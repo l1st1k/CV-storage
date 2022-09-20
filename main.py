@@ -1,10 +1,16 @@
-from fastapi import FastAPI, UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, UploadFile, Query
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from models import CVCreate, CVFullRead, CVInsertIntoDB, CVsRead
+from models import CVFullRead, CVsRead, CVUpdate, CVsFullRead
 from repository import CVRepository
 
 app = FastAPI()
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
 @app.get(
@@ -41,3 +47,58 @@ def _get_cv(cv_id: str):
 )
 def _post_cv(file: UploadFile):
     return CVRepository.create(file=file)
+
+
+@app.patch(
+    "/cv/{cv_id}",
+    response_model=CVFullRead,
+    description="Updates CV by ID",
+    tags=[
+        "CV"
+    ]
+)
+def _update_cv(cv_id: str, model: CVUpdate):
+    return CVRepository.update(cv_id=cv_id, data=model)
+
+
+@app.get(
+    "/cv/{cv_id}/csv",
+    response_class=FileResponse,
+    description='Returns CV in .csv file',
+    tags=[
+        "CV"
+    ]
+)
+def _get_csv(cv_id: str):
+    return CVRepository.get_csv(cv_id=cv_id)
+
+
+@app.delete(
+    "/cv/{cv_id}",
+    response_class=JSONResponse,
+    description='Deletes CV from database',
+    tags=[
+        "CV"
+    ]
+)
+def _delete_csv(cv_id: str):
+    return CVRepository.delete(cv_id=cv_id)
+
+
+@app.get(
+    "/cvs/search",
+    response_model=CVsFullRead,
+    description='Searches for CV with necessary skills',
+    tags=[
+        "CVs"
+    ]
+)
+def _search_cvs(
+        skill: str = Query(default=''),
+        last_name: str = Query(default='', max_length=25),
+        major: str = Query(default='', max_length=25)
+):
+    skill = skill.lower()
+    last_name = last_name.lower()
+    major = major.lower()
+    return CVRepository.search(skill=skill, last_name=last_name, major=major)

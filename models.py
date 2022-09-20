@@ -3,11 +3,12 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, Field
 
 __all__ = (
-    'CVCreate',
+    'CVUpdate',
     'CVInsertIntoDB',
     'CVShortRead',
     'CVsRead',
-    'CVFullRead'
+    'CVFullRead',
+    'CVsFullRead',
 )
 
 
@@ -61,8 +62,21 @@ class CVFields:
     )
 
 
-class CVCreate(BaseModel):
-    """Body of CV POST requests"""
+class CVUpdate(BaseModel):
+    """Body of CV PATCH requests"""
+    first_name: Optional[str] = CVFields.first_name
+    last_name: Optional[str] = CVFields.last_name
+    age: Optional[int] = CVFields.age
+    major: Optional[str] = CVFields.major
+    years_of_exp: Optional[int] = CVFields.years_of_exp
+    phone_number: Optional[str] = CVFields.phone_number
+    skills: Optional[str] = CVFields.skills
+    projects: Optional[str] = CVFields.projects
+    project_amount: Optional[int] = CVFields.project_amount
+
+
+class CVInsertIntoDB(CVUpdate):
+    """Model to insert into database"""
     first_name: str = CVFields.first_name
     last_name: str = CVFields.last_name
     age: int = CVFields.age
@@ -70,12 +84,6 @@ class CVCreate(BaseModel):
     years_of_exp: int = CVFields.years_of_exp
     phone_number: str = CVFields.phone_number
     skills: str = CVFields.skills
-    projects: Optional[str] = CVFields.projects
-    project_amount: Optional[int] = CVFields.project_amount
-
-
-class CVInsertIntoDB(CVCreate):
-    """Model to insert into database"""
     cv_id: str = CVFields.cv_id
     cv_in_bytes: bytes = CVFields.cv_in_bytes
 
@@ -105,3 +113,6 @@ class CVFullRead(BaseModel):
     skills: Union[str, List[str]] = CVFields.skills
     projects: Union[Optional[str], Optional[List[str]]] = CVFields.projects
     project_amount: int = CVFields.project_amount
+
+
+CVsFullRead = List[CVFullRead]

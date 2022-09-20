@@ -6,7 +6,10 @@ from glob import glob
 from typing import Type, Union
 from uuid import uuid4
 
-from models import CVFullRead, CVInsertIntoDB, CVShortRead
+from fastapi import HTTPException
+
+from database import db_table
+from models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 
 __all__ = (
     'model_to_csv',
@@ -14,7 +17,11 @@ __all__ = (
     'get_uuid',
     'b64_to_local_csv',
     'clear_csv',
-    'b64_to_file'
+    'b64_to_file',
+    'update_item_attrs',
+    'update_encoded_string',
+    'check_for_404',
+    'check_for_404_with_item',
 )
 
 
@@ -22,9 +29,10 @@ __all__ = (
 logging.basicConfig(level=logging.INFO)
 
 
-def model_to_csv(model) -> None:
+def model_to_csv(model: CVFullRead) -> None:
     cv_dict = dict(model)
-    with open('temp.csv', 'w', newline='') as csvfile:
+    title = model.last_name + '.csv'
+    with open(title, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(cv_dict.items())
 
@@ -63,8 +71,53 @@ def clear_csv() -> None:
     logging.info("ALL LOCAL .csv ARE CLEARED SUCCESSFULLY!")
 
 
-def b64_to_file(b64_str: bytes) -> None:
+def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> None:
     image_64_decode = base64.b64decode(b64_str)
-    # create a writable image and write the decoding result
-    image_result = open('temp.csv', 'wb')
+    image_result = open(title, 'wb')
     image_result.write(image_64_decode)
+
+
+def update_item_attrs(cv_id: str, model: CVUpdate):
+    # Init expressions
+    update_expression = "set"
+    expression_attribute_values = {}
+    attributes = model.dict()
+    for key, value in attributes.items():
+        if value:
+            update_expression += f' {key} = :{key},'
+            expression_attribute_values[f':{key}'] = value
+
+    #   Cutting the last comma
+    update_expression = update_expression[:-1]
+
+    response = db_table.update_item(
+        Key={'cv_id': cv_id},
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values
+    )
+    return response
+
+
+def update_encoded_string(cv_id: str, encoded_string: bytes):
+    response = db_table.update_item(
+        Key={'cv_id': cv_id},
+        UpdateExpression=f'set cv_in_bytes = :cv_in_bytes',
+        ExpressionAttributeValues={':cv_in_bytes': encoded_string}
+    )
+    return response
+
+
+def check_for_404(container, message: str = "Item can't be found!"):
+    if len(container) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail=message
+        )
+
+
+def check_for_404_with_item(container, item, message: str = "Item can't be found!"):
+    if item not in container:
+        raise HTTPException(
+            status_code=404,
+            detail=message
+        )
