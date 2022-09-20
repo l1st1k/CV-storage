@@ -132,3 +132,10 @@ dmypy.json
 # .idea
 .idea
 */.idea
+
+
+# terraform
+.terraform.lock.hcl
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
