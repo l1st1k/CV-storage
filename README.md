@@ -8,7 +8,7 @@ Stack: Python, FastAPI, DynamoDB, Terraform, LocalStack, boto3.
 `terraform apply -auto-approve` - to create DynamoDB table<br /> 
 `uvicorn main:app --reload` - to start FastAPI application
 
-### [Swagger](127.0.0.1:8000/docs) endpoint
+### [Swagger](http://127.0.0.1:8000/docs) endpoint
 
 ### .env-file: 
 DYNAMODB_ENDPOINT=http://localhost:4566/ <br /> 
