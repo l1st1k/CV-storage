@@ -4,9 +4,9 @@ from base64 import b64encode
 from fastapi import HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 
-from database import db_table
-from models import *
-from services import *
+from src.database import db_table
+from src.models import *
+from src.services import *
 
 __all__ = (
     'CVRepository',

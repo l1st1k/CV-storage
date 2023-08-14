@@ -3,8 +3,8 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import CVFullRead, CVsFullRead, CVsRead, CVUpdate
-from repository import CVRepository
+from src.models import CVFullRead, CVsFullRead, CVsRead, CVUpdate
+from src.repository import CVRepository
 
 app = FastAPI()
 
