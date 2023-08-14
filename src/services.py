@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from fastapi import HTTPException
 
-from database import db_table
+from database import cv_table
 from models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 
 __all__ = (
@@ -97,7 +97,7 @@ def update_item_attrs(cv_id: str, model: CVUpdate):
     update_expression = update_expression[:-1]
 
     # Querying the update to DynamoDB
-    response = db_table.update_item(
+    response = cv_table.update_item(
         Key={'cv_id': cv_id},
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values
@@ -109,7 +109,7 @@ def update_item_attrs(cv_id: str, model: CVUpdate):
 def update_encoded_string(cv_id: str, encoded_string: bytes):
     """Updates single attr (encoded_string)"""
     # Querying the update to DynamoDB
-    response = db_table.update_item(
+    response = cv_table.update_item(
         Key={'cv_id': cv_id},
         UpdateExpression=f'set cv_in_bytes = :cv_in_bytes',
         ExpressionAttributeValues={':cv_in_bytes': encoded_string}

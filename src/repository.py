@@ -4,7 +4,7 @@ from base64 import b64encode
 from fastapi import HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 
-from database import db_table
+from database import cv_table
 from models import *
 from services import *
 
@@ -17,7 +17,7 @@ class CVRepository:
     @staticmethod
     def list() -> CVsRead:
         # Scanning DB
-        response = db_table.scan()
+        response = cv_table.scan()
 
         # Empty DB validation
         check_for_404(response['Items'], message="There is no any CV's in database.")
@@ -26,7 +26,7 @@ class CVRepository:
 
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
-        response = db_table.get_item(
+        response = cv_table.get_item(
             Key={
                 'cv_id': cv_id
             }
@@ -66,7 +66,7 @@ class CVRepository:
             clear_csv()
 
             # Database logic
-            db_table.put_item(Item=dict(model))
+            cv_table.put_item(Item=dict(model))
 
             # Response
             response = JSONResponse(
@@ -110,7 +110,7 @@ class CVRepository:
     @staticmethod
     def get_csv(cv_id: str) -> FileResponse:
         # Querying from DB
-        document = db_table.get_item(
+        document = cv_table.get_item(
             Key={
                 'cv_id': cv_id
             },
@@ -139,7 +139,7 @@ class CVRepository:
     @staticmethod
     def delete(cv_id: str) -> JSONResponse:
         # Querying from DB
-        db_response = db_table.delete_item(
+        db_response = cv_table.delete_item(
             Key={
                 'cv_id': cv_id
             }
@@ -161,7 +161,7 @@ class CVRepository:
 
     @staticmethod
     def search(skill: str, last_name: str, major: str) -> CVsFullRead:
-        response_from_db = db_table.scan()
+        response_from_db = cv_table.scan()
 
         # Empty DB validation
         check_for_404(response_from_db['Items'], message="There is no any CV's in database!")

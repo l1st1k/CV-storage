@@ -1,12 +1,12 @@
-resource "aws_dynamodb_table" "cv-dynamodb-table" {
-  name           = "cv_table"
+resource "aws_dynamodb_table" "manager-dynamodb-table" {
+  name           = "manager_table"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
-  hash_key       = "cv_id"
+  hash_key       = "manager_id"
 
   attribute {
-    name = "cv_id"
+    name = "manager_id"
     type = "S"
   }
 
