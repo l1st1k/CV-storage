@@ -4,23 +4,18 @@ import logging
 import os
 from glob import glob
 from typing import Type, Union
-from uuid import uuid4
-
-from fastapi import HTTPException
 
 from database import cv_table
-from models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
+
+from cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 
 __all__ = (
     'model_to_csv',
     'csv_to_model',
-    'get_uuid',
     'clear_csv',
     'b64_to_file',
     'update_item_attrs',
     'update_encoded_string',
-    'check_for_404',
-    'check_for_404_with_item',
 )
 
 
@@ -50,11 +45,6 @@ def csv_to_model(
     # Model choice
     model = response_class(**cv_dict)
     return model
-
-
-def get_uuid() -> str:
-    """Returns an unique UUID (UUID4)"""
-    return str(uuid4())
 
 
 def clear_csv() -> None:
@@ -115,24 +105,3 @@ def update_encoded_string(cv_id: str, encoded_string: bytes):
         ExpressionAttributeValues={':cv_in_bytes': encoded_string}
     )
     return response
-
-
-def check_for_404(container, message: str = "Item can't be found!"):
-    """Checks container for 'empty' case"""
-    if len(container) == 0:
-        raise HTTPException(
-            status_code=404,
-            detail=message
-        )
-
-
-def check_for_404_with_item(container, item, message: str = "Item can't be found!"):
-    """
-    Checks response for 'empty' case
-    Used only for checking responses of .get_item() function
-    """
-    if item not in container:
-        raise HTTPException(
-            status_code=404,
-            detail=message
-        )
