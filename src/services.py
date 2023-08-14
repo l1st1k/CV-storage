@@ -8,8 +8,8 @@ from uuid import uuid4
 
 from fastapi import HTTPException
 
-from src.database import db_table
-from src.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
+from database import db_table
+from models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 
 __all__ = (
     'model_to_csv',
