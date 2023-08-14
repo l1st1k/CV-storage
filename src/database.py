@@ -17,4 +17,4 @@ dynamo_resource = boto3.resource("dynamodb", endpoint_url=DYNAMODB_ENDPOINT, aws
                                  aws_secret_access_key=AWS_SECRET_ACCESS_KEY, region_name=AWS_REGION)
 
 # Table
-db_table = dynamo_resource.Table('main_table')
+db_table = dynamo_resource.Table('cv_table')
