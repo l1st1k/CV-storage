@@ -32,7 +32,7 @@ async def http_exception_handler(request, exc):
     response_model=CVsRead,
     description="List all the CVs",
     tags=[
-        "CVs"
+        "CV"
     ]
 )
 def _list_cvs():
@@ -104,7 +104,7 @@ def _delete_csv(cv_id: str):
     response_model=CVsFullRead,
     description='Searches for CV with necessary skills',
     tags=[
-        "CVs"
+        "CV"
     ]
 )
 def _search_cvs(
