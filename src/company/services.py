@@ -2,7 +2,7 @@ import logging
 
 from database import company_table
 
-from company.models import CompanyUpdate, CompanyInsertAndFullRead
+from company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (
 

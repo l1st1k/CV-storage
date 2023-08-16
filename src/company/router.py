@@ -1,8 +1,8 @@
 from fastapi import UploadFile
 from fastapi.responses import JSONResponse
 
-from company.repository import CompanyRepository
 from company.models import *
+from company.repository import CompanyRepository
 
 
 class CompanyRouter:

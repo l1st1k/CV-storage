@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from cv.router import CVRouter
 from company.router import CompanyRouter
+from cv.router import CVRouter
 
 app = FastAPI()
 

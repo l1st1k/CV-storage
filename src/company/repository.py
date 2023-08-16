@@ -6,7 +6,8 @@ from fastapi import HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 from services_general import check_for_404, check_for_404_with_item, get_uuid
 
-from company.models import CompanyUpdate, CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
+from company.models import (CompaniesRead, CompanyInsertAndFullRead,
+                            CompanyShortRead, CompanyUpdate)
 from company.services import *
 
 __all__ = (

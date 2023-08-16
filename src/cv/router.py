@@ -1,8 +1,8 @@
-from fastapi import UploadFile, Query
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi import Query, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 
-from cv.repository import CVRepository
 from cv.models import *
+from cv.repository import CVRepository
 
 
 class CVRouter:
