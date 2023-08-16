@@ -4,8 +4,9 @@ from pydantic import BaseModel, Field
 
 __all__ = (
     'CompanyUpdate',
-    'CompanyInsertAndRead',
+    'CompanyInsertAndFullRead',
     'CompaniesRead',
+    'CompanyShortRead'
 )
 
 
@@ -37,15 +38,22 @@ class CompanyUpdate(BaseModel):
     """Body of Company PATCH requests"""
     company_name: Optional[str] = CompanyFields.company_name
     logo_in_bytes: Optional[str] = CompanyFields.logo_in_bytes
-    managers: Optional[str] = CompanyFields.managers
+    managers: Optional[set] = CompanyFields.managers
 
 
-class CompanyInsertAndRead(CompanyUpdate):
-    """Model to insert into database"""
-    company_name: str = CompanyFields.company_name
-    logo_in_bytes: str = CompanyFields.logo_in_bytes
+class CompanyInsertAndFullRead(CompanyUpdate):
+    """Model to insert into database and full read case"""
     company_id: str = CompanyFields.company_id
-    managers: Optional[str] = CompanyFields.managers
+    company_name: str = CompanyFields.company_name
+    managers: Optional[set] = CompanyFields.managers
+    logo_in_bytes: str = CompanyFields.logo_in_bytes
 
 
-CompaniesRead = List[CompanyInsertAndRead]
+class CompanyShortRead(BaseModel):
+    """Model for reading without logo"""
+    company_id: str = CompanyFields.company_id
+    company_name: str = CompanyFields.company_name
+    managers: Optional[set] = CompanyFields.managers
+
+
+CompaniesRead = List[CompanyShortRead]

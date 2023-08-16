@@ -4,6 +4,7 @@ from fastapi.responses import PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from cv.router import CVRouter
+from company.router import CompanyRouter
 
 app = FastAPI()
 
@@ -27,6 +28,7 @@ async def http_exception_handler(request, exc):
 
 routers = [
     CVRouter,
+    CompanyRouter,
 ]
 
 for router in routers:
