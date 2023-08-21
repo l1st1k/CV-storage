@@ -57,6 +57,8 @@ class CompanyInsertAndFullRead(CompanyUpdate):
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name
     email: str = CompanyFields.email
+    hashed_password: bytes = CompanyFields.hashed_password
+    salt: bytes = CompanyFields.salt
     managers: Optional[set] = CompanyFields.managers
     logo_in_bytes: str = CompanyFields.logo_in_bytes
 

@@ -1,14 +1,17 @@
 import logging
-from base64 import b64encode
+
+from fastapi_jwt_auth import AuthJWT
 
 from database import company_table
-from fastapi import HTTPException, UploadFile, status
-from fastapi.responses import FileResponse, JSONResponse
-from services_general import check_for_404, check_for_404_with_item, get_uuid
+from fastapi import HTTPException, UploadFile, status, Depends
+from fastapi.responses import JSONResponse
+
+from services_auth import AuthModel, verify_password
+from services_general import check_for_404, check_for_404_with_item
 
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
-from company.services import *
+from company.services import create_company_model, check_photo_type, get_company_from_db
 
 __all__ = (
     'CompanyRepository',
@@ -45,37 +48,25 @@ class CompanyRepository:
         return CompanyInsertAndFullRead(**document)
 
     @staticmethod
-    def create(name: str, photo: UploadFile) -> JSONResponse:
+    def create(name: str, credentials: AuthModel, photo: UploadFile) -> JSONResponse:
         """Creates company and returns its id"""
         try:
             # Type check
-            if photo and (photo.content_type not in (
-                    'image/jpeg',
-                    'image/png',
-                    'image/jpg')
-            ):
-                raise TypeError
-
-            # Photo into base 64
-            encoded_string: bytes = b64encode(photo.file.read())
+            check_photo_type(photo)
 
             # Creating model
-            model = CompanyInsertAndFullRead(
-                company_id=get_uuid(),
-                company_name=name,
-                logo_in_bytes=encoded_string,
-            )
+            model = create_company_model(name, credentials, photo)
 
             # Database logic
             company_table.put_item(Item=dict(model))
 
             # Logging
-            logging.info(f"New Company created: {name}")
+            logging.info(f"New Company registered: {name}")
 
             # Response
             response = JSONResponse(
                 content={
-                    "message": f"New Company created successfully!",
+                    "message": f"New Company registered successfully!",
                     "company_id": model.company_id
                 },
                 status_code=status.HTTP_201_CREATED)
@@ -87,6 +78,24 @@ class CompanyRepository:
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
             )
         return response
+
+    @staticmethod
+    def login(credentials: AuthModel, Authorize: AuthJWT = Depends()):
+        # Getting user from DB
+        user = get_company_from_db(credentials.login)
+
+        # Verifying password
+        if not verify_password(
+                input_password=credentials.password,
+                stored_hashed_password=user.hashed_password,
+                salt=user.salt
+        ):
+            raise HTTPException(status_code=401, detail="Bad username or password")
+
+        # Generating tokens
+        access_token = Authorize.create_access_token(subject=credentials.login)
+        refresh_token = Authorize.create_refresh_token(subject=credentials.login)
+        return {"access_token": access_token, "refresh_token": refresh_token}
 
     # @classmethod
     # def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:

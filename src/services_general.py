@@ -19,7 +19,7 @@ def get_uuid() -> str:
     return str(uuid4())
 
 
-def check_for_404(container, message: str = "Item can't be found!"):
+def check_for_404(container, message: str = "Item can't be found!") -> None:
     """Checks container for 'empty' case"""
     if len(container) == 0:
         raise HTTPException(
@@ -28,7 +28,7 @@ def check_for_404(container, message: str = "Item can't be found!"):
         )
 
 
-def check_for_404_with_item(container, item, message: str = "Item can't be found!"):
+def check_for_404_with_item(container, item, message: str = "Item can't be found!") -> None:
     """
     Checks response for 'empty' case
     Used only for checking responses of .get_item() function
