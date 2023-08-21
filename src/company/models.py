@@ -32,11 +32,22 @@ class CompanyFields:
         description='Company logo encoded into base64',
         default=None
     )
+    email = Field(
+        description="Company's email for communication",
+        example="contact@white-snake.com"
+    )
+    hashed_password = Field(
+        description="Company's account password hashed with unique salt"
+    )
+    salt = Field(
+        description="Unique salt for the password"
+    )
 
 
 class CompanyUpdate(BaseModel):
     """Body of Company PATCH requests"""
     company_name: Optional[str] = CompanyFields.company_name
+    email: Optional[str] = CompanyFields.email
     logo_in_bytes: Optional[str] = CompanyFields.logo_in_bytes
     managers: Optional[set] = CompanyFields.managers
 
@@ -45,6 +56,7 @@ class CompanyInsertAndFullRead(CompanyUpdate):
     """Model to insert into database and full read case"""
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name
+    email: str = CompanyFields.email
     managers: Optional[set] = CompanyFields.managers
     logo_in_bytes: str = CompanyFields.logo_in_bytes
 
@@ -53,6 +65,7 @@ class CompanyShortRead(BaseModel):
     """Model for reading without logo"""
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name
+    email: str = CompanyFields.email
     managers: Optional[set] = CompanyFields.managers
 
 
