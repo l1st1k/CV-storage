@@ -1,4 +1,4 @@
-from fastapi import UploadFile
+from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
 
 from company.models import *
@@ -27,8 +27,16 @@ class CompanyRouter:
     async def get_company(self, company_id: str) -> CompanyInsertAndFullRead:
         return CompanyRepository.get(company_id=company_id)
 
-    async def register_company(self, name: str, credentials: AuthModel, photo: UploadFile) -> JSONResponse:
+    async def register_company(self, name: str, login: str, password: str, photo: UploadFile = File()) -> JSONResponse:
+        credentials = AuthModel(
+            login=login,
+            password=password
+        )
         return CompanyRepository.create(name=name, credentials=credentials, photo=photo)
 
-    async def login_as_company(self, credentials: AuthModel) -> JSONResponse:
+    async def login_as_company(self, login: str, password: str) -> JSONResponse:
+        credentials = AuthModel(
+            login=login,
+            password=password
+        )
         return CompanyRepository.login(credentials=credentials)

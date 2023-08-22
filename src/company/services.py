@@ -1,6 +1,8 @@
 import logging
 from base64 import b64encode
+from typing import Optional
 
+from boto3.dynamodb.conditions import Key
 from fastapi import UploadFile
 
 from database import company_table
@@ -40,7 +42,7 @@ def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -
     return CompanyInsertAndFullRead(
         company_id=get_uuid(),
         email=credentials.login,
-        password=hashed_password,
+        hashed_password=hashed_password,
         salt=salt,
         company_name=name,
         logo_in_bytes=encoded_string,
