@@ -1,8 +1,10 @@
 from typing import Tuple
 
 import bcrypt
-from dotenv import dotenv_values
 from pydantic import BaseModel, Field
+
+from config import AUTH_KEY
+
 
 __all__ = (
     'Settings',
@@ -10,9 +12,6 @@ __all__ = (
     'hash_password',
     'verify_password',
 )
-
-config = dotenv_values(".env")
-AUTH_KEY = config["AUTH_KEY"]
 
 
 class Settings(BaseModel):
