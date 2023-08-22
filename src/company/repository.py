@@ -45,6 +45,8 @@ class CompanyRepository:
         )
 
         document = response['Item']
+        document['salt'] = bytes(document['salt'])
+        document['hashed_password'] = bytes(document['hashed_password'])
         return CompanyInsertAndFullRead(**document)
 
     @staticmethod
