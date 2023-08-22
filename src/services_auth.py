@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 
 from config import AUTH_KEY
 
-
 __all__ = (
     'Settings',
     'AuthModel',

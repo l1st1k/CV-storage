@@ -1,6 +1,7 @@
 import boto3
 
-from config import DYNAMODB_ENDPOINT, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_ACCESS_KEY
+from config import (AWS_ACCESS_KEY, AWS_REGION, AWS_SECRET_ACCESS_KEY,
+                    DYNAMODB_ENDPOINT)
 
 __all__ = (
     'cv_table',

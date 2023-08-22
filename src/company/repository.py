@@ -1,17 +1,16 @@
 import logging
 
-from fastapi_jwt_auth import AuthJWT
-
 from database import company_table
-from fastapi import HTTPException, UploadFile, status, Depends
+from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
-
+from fastapi_jwt_auth import AuthJWT
 from services_auth import AuthModel, verify_password
 from services_general import check_for_404, check_for_404_with_item
 
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
-from company.services import create_company_model, check_photo_type, get_company_from_db
+from company.services import (check_photo_type, create_company_model,
+                              get_company_from_db)
 
 __all__ = (
     'CompanyRepository',

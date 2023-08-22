@@ -6,11 +6,9 @@ from boto3.dynamodb.conditions import Attr
 from fastapi import UploadFile
 
 from database import company_table
-
-from company.models import CompanyInsertAndFullRead, CompanyUpdate
 from services_auth import AuthModel, hash_password
 from services_general import get_uuid
-
+from company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (
     'get_company_from_db',
