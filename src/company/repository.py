@@ -1,16 +1,17 @@
 import logging
 
-from database import company_table
 from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from services_auth import AuthModel, verify_password
-from services_general import check_for_404, check_for_404_with_item
 
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
+from company.permissions import is_company_owner
 from company.services import (check_photo_type, create_company_model,
                               get_company_from_db)
+from database import company_table
+from services_auth import AuthModel, verify_password
+from services_general import check_for_404, check_for_404_with_item
 
 __all__ = (
     'CompanyRepository',
@@ -29,8 +30,11 @@ class CompanyRepository:
         return [CompanyShortRead(**document) for document in response['Items']]
 
     @staticmethod
-    def get(company_id: str) -> CompanyInsertAndFullRead:
-        response = company_table.get_item(
+    def get(company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
+        Authorize.jwt_required()
+        email = Authorize.get_jwt_subject()
+
+        db_response = company_table.get_item(
             Key={
                 'company_id': company_id
             }
@@ -38,12 +42,16 @@ class CompanyRepository:
 
         # 404 validation
         check_for_404_with_item(
-            container=response,
+            container=db_response,
             item='Item',
             message='Company not found.'
         )
 
-        document = response['Item']
+        # Permission check
+        if not is_company_owner(email, company_id):
+            raise HTTPException(status_code=403, detail='No permissions')
+
+        document = db_response['Item']
         document['salt'] = bytes(document['salt'])
         document['hashed_password'] = bytes(document['hashed_password'])
         return CompanyInsertAndFullRead(**document)

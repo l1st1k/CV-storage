@@ -25,8 +25,8 @@ class CompanyRouter:
     async def list_companies(self) -> CompaniesRead:
         return CompanyRepository.list()
 
-    async def get_company(self, company_id: str) -> CompanyInsertAndFullRead:
-        return CompanyRepository.get(company_id=company_id)
+    async def get_company(self, company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
+        return CompanyRepository.get(company_id=company_id, Authorize=Authorize)
 
     async def register_company(self, name: str, login: str, password: str, photo: UploadFile = File()) -> JSONResponse:
         credentials = AuthModel(
