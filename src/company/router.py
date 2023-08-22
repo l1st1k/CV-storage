@@ -1,5 +1,6 @@
-from fastapi import UploadFile, File
+from fastapi import UploadFile, File, Depends
 from fastapi.responses import JSONResponse
+from fastapi_jwt_auth import AuthJWT
 
 from company.models import *
 from company.repository import CompanyRepository
@@ -34,9 +35,9 @@ class CompanyRouter:
         )
         return CompanyRepository.create(name=name, credentials=credentials, photo=photo)
 
-    async def login_as_company(self, login: str, password: str) -> JSONResponse:
+    async def login_as_company(self, login: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         credentials = AuthModel(
             login=login,
             password=password
         )
-        return CompanyRepository.login(credentials=credentials)
+        return CompanyRepository.login(credentials=credentials, Authorize=Authorize)

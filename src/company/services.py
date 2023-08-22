@@ -2,7 +2,7 @@ import logging
 from base64 import b64encode
 from typing import Optional
 
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Attr
 from fastapi import UploadFile
 
 from database import company_table
@@ -49,11 +49,17 @@ def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -
     )
 
 
-def get_company_from_db(email: str) -> CompanyInsertAndFullRead:
-    response = company_table.get_item(
-        Key={
-            'email': email
-        }
+def get_company_from_db(email: str) -> Optional[CompanyInsertAndFullRead]:
+    response = company_table.scan(
+        FilterExpression=Attr('email').eq(email)
     )
-    document = response['Item']
-    return CompanyInsertAndFullRead(**document)
+    items = response['Items']
+    if items:
+        # Assuming we only expect one item matching the email
+        document = items[0]
+        document['salt'] = bytes(document['salt'])
+        document['hashed_password'] = bytes(document['hashed_password'])
+        return CompanyInsertAndFullRead(**document)
+    else:
+        # Handle the case where no items match the email
+        return None
