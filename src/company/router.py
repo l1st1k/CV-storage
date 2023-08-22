@@ -22,20 +22,24 @@ class CompanyRouter:
         # self.app.patch("/company/{company_id}", response_model=CVFullRead, tags=self.tags)(self.update_cv)
         # self.app.delete("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.delete_cv)
 
-    async def list_companies(self) -> CompaniesRead:
+    @staticmethod
+    async def list_companies() -> CompaniesRead:
         return CompanyRepository.list()
 
-    async def get_company(self, company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
+    @staticmethod
+    async def get_company(company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
         return CompanyRepository.get(company_id=company_id, Authorize=Authorize)
 
-    async def register_company(self, name: str, login: str, password: str, photo: UploadFile = File()) -> JSONResponse:
+    @staticmethod
+    async def register_company(name: str, login: str, password: str, photo: UploadFile = File()) -> JSONResponse:
         credentials = AuthModel(
             login=login,
             password=password
         )
         return CompanyRepository.create(name=name, credentials=credentials, photo=photo)
 
-    async def login_as_company(self, login: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+    @staticmethod
+    async def login_as_company(login: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         credentials = AuthModel(
             login=login,
             password=password
