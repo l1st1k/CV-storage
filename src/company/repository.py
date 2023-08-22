@@ -129,25 +129,32 @@ class CompanyRepository:
     #     # Responding with the full model of updated items
     #     return model
     #
-    # @staticmethod
-    # def delete(cv_id: str) -> JSONResponse:
-    #     # Querying from DB
-    #     db_response = cv_table.delete_item(
-    #         Key={
-    #             'cv_id': cv_id
-    #         }
-    #     )
-    #
-    #     # 404 validation
-    #     if 'ConsumedCapacity' in db_response:
-    #         raise HTTPException(
-    #             status_code=404,
-    #             detail='CV not found.'
-    #         )
-    #
-    #     # Response
-    #     response = JSONResponse(
-    #             content="CV successfully deleted!",
-    #             status_code=status.HTTP_200_OK
-    #         )
-    #     return response
+    @staticmethod
+    def delete(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        email = Authorize.get_jwt_subject()
+
+        # Permission check
+        if not is_company_owner(email, company_id):
+            raise HTTPException(status_code=403, detail='No permissions')
+
+        # Querying deletion from DB
+        db_response = company_table.delete_item(
+            Key={
+                'company_id': company_id
+            }
+        )
+
+        # 404 validation
+        if 'ConsumedCapacity' in db_response:
+            raise HTTPException(
+                status_code=404,
+                detail='CV not found.'
+            )
+
+        # Response
+        response = JSONResponse(
+                content="CV successfully deleted!",
+                status_code=status.HTTP_200_OK
+            )
+        return response
