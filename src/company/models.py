@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from fastapi import UploadFile
 from pydantic import BaseModel, Field
 
 __all__ = (
@@ -32,9 +33,15 @@ class CompanyFields:
         description='Company logo encoded into base64',
         default=None
     )
+    new_photo = Field(
+        description='New company logo for update'
+    )
     email = Field(
         description="Company's email for communication",
         example="contact@white-snake.com"
+    )
+    new_password = Field(
+        description="New password for update"
     )
     hashed_password = Field(
         description="Company's account password hashed with unique salt"
@@ -48,11 +55,12 @@ class CompanyUpdate(BaseModel):
     """Body of Company PATCH requests"""
     company_name: Optional[str] = CompanyFields.company_name
     email: Optional[str] = CompanyFields.email
-    logo_in_bytes: Optional[str] = CompanyFields.logo_in_bytes
+    new_password: Optional[str] = CompanyFields.new_password
+    new_photo: Optional[UploadFile] = CompanyFields.new_photo
     managers: Optional[set] = CompanyFields.managers
 
 
-class CompanyInsertAndFullRead(CompanyUpdate):
+class CompanyInsertAndFullRead(BaseModel):
     """Model to insert into database and full read case"""
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name

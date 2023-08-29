@@ -8,7 +8,7 @@ from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
 from company.permissions import is_company_owner
 from company.services import (check_photo_type, create_company_model,
-                              get_company_from_db)
+                              get_company_from_db, update_item_attrs)
 from database import company_table
 from services_auth import AuthModel, verify_password
 from services_general import check_for_404, check_for_404_with_item
@@ -106,29 +106,30 @@ class CompanyRepository:
         refresh_token = Authorize.create_refresh_token(subject=credentials.login)
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-    # @classmethod
-    # def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
-    #     # Updating model's fields
-    #     update_item_attrs(cv_id, data)
-    #
-    #     # Taking updated attrs in model
-    #     model: CVFullRead = cls.get(cv_id)
-    #
-    #     # Writing local .csv with updated attrs
-    #     model_to_csv(model)
-    #
-    #     # Reading .csv into base64
-    #     filename = model.last_name + '.csv'
-    #     with open(filename, "rb") as file:
-    #         encoded_string = b64encode(file.read())
-    #     update_encoded_string(cv_id=cv_id, encoded_string=encoded_string)
-    #
-    #     # Deleting local .csv
-    #     clear_csv()
-    #
-    #     # Responding with the full model of updated items
-    #     return model
-    #
+    @staticmethod
+    def update(company_id: str, model_from_user: CompanyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        email = Authorize.get_jwt_subject()
+
+        db_response = company_table.get_item(
+            Key={
+                'company_id': company_id
+            }
+        )
+        model_from_db = CompanyShortRead(**db_response['Item'])
+        if email != model_from_db.email:
+            raise HTTPException(status_code=403, detail="You're not allowed to access other companies!")
+
+        update_item_attrs(company_id=company_id, model=model_from_user)
+
+        response = JSONResponse(
+            content={
+                "message": "Company's profile updated successfully!"
+            },
+            status_code=status.HTTP_200_OK
+        )
+        return response
+
     @staticmethod
     def delete(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         Authorize.jwt_required()

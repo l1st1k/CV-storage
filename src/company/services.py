@@ -3,7 +3,7 @@ from base64 import b64encode
 from typing import Optional
 
 from boto3.dynamodb.conditions import Attr
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 
 from database import company_table
 from services_auth import AuthModel, hash_password
@@ -14,6 +14,7 @@ __all__ = (
     'get_company_from_db',
     'check_photo_type',
     'create_company_model',
+    'update_item_attrs',
 )
 
 
@@ -59,5 +60,42 @@ def get_company_from_db(email: str) -> Optional[CompanyInsertAndFullRead]:
         document['hashed_password'] = bytes(document['hashed_password'])
         return CompanyInsertAndFullRead(**document)
     else:
-        # Handle the case where no items match the email
-        return None
+        raise HTTPException(status_code=401, detail='You entered wrong email!')
+
+
+def update_item_attrs(company_id: str, model: CompanyUpdate):
+    """Updates company model in database"""
+    # Init expressions for DynamoDB update
+    update_expression = "set"
+    expression_attribute_values = {}
+    attributes: dict = model.dict()
+
+    if model.new_photo:
+        # Photo into base 64
+        encoded_string: bytes = b64encode(model.new_photo.file.read())
+        attributes.pop('new_photo')
+        attributes.update({'logo_in_bytes': encoded_string})
+
+    if model.new_password:
+        # Generate unique salt and hash the password
+        hashed_password, salt = hash_password(model.new_password)
+        attributes.pop('new_password')
+        attributes.update({'hashed_password': hashed_password,
+                           'salt': salt})
+
+    # Filling the expressions
+    for key, value in attributes.items():
+        if value:
+            update_expression += f' {key} = :{key},'
+            expression_attribute_values[f':{key}'] = value
+
+    # Cutting the last comma
+    update_expression = update_expression[:-1]
+
+    # Querying the update to DynamoDB
+    response = company_table.update_item(
+        Key={'company_id': company_id},
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values
+    )
+    return response
