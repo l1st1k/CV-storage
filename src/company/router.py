@@ -30,9 +30,9 @@ class CompanyRouter:
         return CompanyRepository.get(company_id=company_id, Authorize=Authorize)
 
     @staticmethod
-    async def register_company(name: str, login: str, password: str, photo: UploadFile = File()) -> JSONResponse:
+    async def register_company(name: str, email: str, password: str, photo: UploadFile = File()) -> JSONResponse:
         credentials = AuthModel(
-            login=login,
+            login=email,
             password=password
         )
         return CompanyRepository.create(name=name, credentials=credentials, photo=photo)
