@@ -1,12 +1,12 @@
 from typing import Tuple
 
 import bcrypt
+from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel, Field
 
 from config import AUTH_KEY
 
 __all__ = (
-    'Settings',
     'AuthModel',
     'hash_password',
     'verify_password',
@@ -15,6 +15,11 @@ __all__ = (
 
 class Settings(BaseModel):
     authjwt_secret_key: str = AUTH_KEY
+
+
+@AuthJWT.load_config
+def get_config():
+    return Settings()
 
 
 class AuthModel(BaseModel):

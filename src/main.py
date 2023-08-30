@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
-from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from company.router import CompanyRouter
 from cv.router import CVRouter
-from services_auth import Settings
 
 app = FastAPI()
 
@@ -36,11 +34,6 @@ def auth_jwt_exception_handler(request: Request, exc: AuthJWTException):
         status_code=exc.status_code,
         content={"detail": exc.message}
     )
-
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
 
 
 routers = [
