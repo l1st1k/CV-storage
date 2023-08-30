@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.app_handlers import configure_app_handlers
 from core.app_routers import configure_app_routes
 
 app = FastAPI()
@@ -19,3 +20,4 @@ app.add_middleware(
 )
 
 configure_app_routes(app)
+configure_app_handlers(app)
