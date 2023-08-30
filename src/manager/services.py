@@ -3,6 +3,8 @@ from fastapi import HTTPException
 
 from company.services import get_company_from_db
 from core.database import manager_table
+from core.services_auth import hash_password, AuthModel
+from core.services_general import get_uuid
 from manager.models import *
 
 
@@ -17,3 +19,16 @@ def select_companys_managers(company_email: str):
         return [ManagerShortRead(**document) for document in items]
     else:
         raise HTTPException(status_code=404, detail=f'There are no any managers in {company.company_name}.')
+
+
+def create_manager_model(company_id: str, credentials: AuthModel) -> ManagerInsertAndFullRead:
+    # Generate unique salt and hash the password
+    hashed_password, salt = hash_password(credentials.password)
+
+    return ManagerInsertAndFullRead(
+        manager_id=get_uuid(),
+        company_id=company_id,
+        email=credentials.login,
+        hashed_password=hashed_password,
+        salt=salt
+    )
