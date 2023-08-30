@@ -5,9 +5,9 @@ from typing import Optional
 from boto3.dynamodb.conditions import Attr
 from fastapi import UploadFile, HTTPException
 
-from database import company_table
-from services_auth import AuthModel, hash_password
-from services_general import get_uuid
+from core.database import company_table
+from core.services_auth import AuthModel, hash_password
+from core.services_general import get_uuid
 from company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (

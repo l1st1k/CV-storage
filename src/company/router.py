@@ -1,7 +1,7 @@
 from fastapi import Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from services_auth import AuthModel
+from core.services_auth import AuthModel
 
 from company.models import *
 from company.repository import CompanyRepository

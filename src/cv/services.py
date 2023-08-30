@@ -5,7 +5,7 @@ import os
 from glob import glob
 from typing import Type, Union
 
-from database import cv_table
+from core.database import cv_table
 
 from cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
 

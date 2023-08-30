@@ -1,10 +1,10 @@
 import logging
 from base64 import b64encode
 
-from database import cv_table
+from core.database import cv_table
 from fastapi import HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
-from services_general import check_for_404, check_for_404_with_item, get_uuid
+from core.services_general import check_for_404, check_for_404_with_item, get_uuid
 
 from cv.models import *
 from cv.services import *

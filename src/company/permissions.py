@@ -1,4 +1,4 @@
-from database import company_table
+from core.database import company_table
 
 
 __all__ = (

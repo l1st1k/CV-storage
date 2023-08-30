@@ -4,7 +4,7 @@ import bcrypt
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel, Field
 
-from config import AUTH_KEY
+from core.config import AUTH_KEY
 
 __all__ = (
     'AuthModel',

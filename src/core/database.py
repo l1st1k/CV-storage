@@ -1,6 +1,6 @@
 import boto3
 
-from config import (AWS_ACCESS_KEY, AWS_REGION, AWS_SECRET_ACCESS_KEY,
+from core.config import (AWS_ACCESS_KEY, AWS_REGION, AWS_SECRET_ACCESS_KEY,
                     DYNAMODB_ENDPOINT)
 
 __all__ = (
