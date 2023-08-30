@@ -1,15 +1,19 @@
+from fastapi import Depends
+from fastapi_jwt_auth import AuthJWT
+
 from core.database import manager_table
 from core.services_general import check_for_404
 from manager.models import *
+from manager.services import select_companys_managers
 
 
 class ManagerRepository:
     @staticmethod
-    def list() -> ManagersRead:
+    def list(Authorize: AuthJWT = Depends()) -> ManagersRead:
+        Authorize.jwt_required()
+        company_email = Authorize.get_jwt_subject()
+
         # Scanning DB
-        response = manager_table.scan()
+        list_of_managers = select_companys_managers(company_email=company_email)
 
-        # Empty DB validation
-        check_for_404(response['Items'], message="There are no any manager in this company.")
-
-        return [ManagerShortRead(**document) for document in response['Items']]
+        return list_of_managers
