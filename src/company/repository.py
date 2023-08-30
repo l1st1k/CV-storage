@@ -25,7 +25,7 @@ class CompanyRepository:
         response = company_table.scan()
 
         # Empty DB validation
-        check_for_404(response['Items'], message="There is no any Companies in database.")
+        check_for_404(response['Items'], message="There are no any Companies in database.")
 
         return [CompanyShortRead(**document) for document in response['Items']]
 
