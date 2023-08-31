@@ -7,13 +7,14 @@ from fastapi import UploadFile, HTTPException
 
 from core.database import company_table
 from core.services_auth import AuthModel, hash_password
-from core.services_general import get_uuid
+from core.services_general import get_uuid, check_for_404_with_item
 from company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (
-    'get_company_from_db',
     'check_photo_type',
     'create_company_model',
+    'get_company_by_email',
+    'get_company_by_id',
     'update_item_attrs',
 )
 
@@ -48,7 +49,7 @@ def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -
     )
 
 
-def get_company_from_db(email: str) -> Optional[CompanyInsertAndFullRead]:
+def get_company_by_email(email: str) -> Optional[CompanyInsertAndFullRead]:
     response = company_table.scan(
         FilterExpression=Attr('email').eq(email)
     )
@@ -61,6 +62,24 @@ def get_company_from_db(email: str) -> Optional[CompanyInsertAndFullRead]:
         return CompanyInsertAndFullRead(**document)
     else:
         raise HTTPException(status_code=401, detail='You entered wrong email!')
+
+
+def get_company_by_id(company_id: str) -> Optional[CompanyInsertAndFullRead]:
+    response = company_table.get_item(
+        Key={
+            'company_id': company_id
+        }
+    )
+
+    # 404 validation
+    check_for_404_with_item(
+        container=response,
+        item='Item',
+        message='Company not found.'
+    )
+
+    document = response['Item']
+    return CompanyInsertAndFullRead(**document)
 
 
 def update_item_attrs(company_id: str, model: CompanyUpdate):

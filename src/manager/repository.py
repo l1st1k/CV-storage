@@ -4,10 +4,9 @@ from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from company.services import get_company_from_db
+from company.services import get_company_by_id
 from core.database import manager_table
 from core.services_auth import AuthModel
-from core.services_general import check_for_404
 from manager.models import *
 from manager.services import select_companys_managers, create_manager_model
 
@@ -16,26 +15,26 @@ class ManagerRepository:
     @staticmethod
     def list(Authorize: AuthJWT = Depends()) -> ManagersRead:
         Authorize.jwt_required()
-        company_email = Authorize.get_jwt_subject()
+        company_id_from_token = Authorize.get_jwt_subject()
 
         # Scanning DB
-        list_of_managers = select_companys_managers(company_email=company_email)
+        list_of_managers = select_companys_managers(company_id=company_id_from_token)
 
         return list_of_managers
 
     @staticmethod
     def create(credentials: AuthModel, Authorize: AuthJWT = Depends()) -> JSONResponse:
         Authorize.jwt_required()
-        company_email = Authorize.get_jwt_subject()
-        company = get_company_from_db(company_email)
+        company_id_from_token = Authorize.get_jwt_subject()
 
         # Model creation
-        model = create_manager_model(company.company_id, credentials)
+        model = create_manager_model(company_id_from_token, credentials)
 
         # Database logic
         manager_table.put_item(Item=dict(model))
 
         # Logging
+        company = get_company_by_id(company_id=company_id_from_token)
         logging.info(f"Company '{company.company_name}' registered new manager: '{credentials.login}'!")
 
         # Response

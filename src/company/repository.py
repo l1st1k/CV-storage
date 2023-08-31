@@ -6,9 +6,8 @@ from fastapi_jwt_auth import AuthJWT
 
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
-from company.permissions import is_company_owner
 from company.services import (check_photo_type, create_company_model,
-                              get_company_from_db, update_item_attrs)
+                              get_company_by_email, update_item_attrs)
 from core.database import company_table
 from core.services_auth import AuthModel, verify_password
 from core.services_general import check_for_404, check_for_404_with_item
@@ -30,13 +29,17 @@ class CompanyRepository:
         return [CompanyShortRead(**document) for document in response['Items']]
 
     @staticmethod
-    def get(company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
+    def get(company_id_from_user: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
         Authorize.jwt_required()
-        email = Authorize.get_jwt_subject()
+        company_id_from_token = Authorize.get_jwt_subject()
+
+        # Permission check
+        if company_id_from_token != company_id_from_user:
+            raise HTTPException(status_code=403, detail='No permissions')
 
         db_response = company_table.get_item(
             Key={
-                'company_id': company_id
+                'company_id': company_id_from_user
             }
         )
 
@@ -46,10 +49,6 @@ class CompanyRepository:
             item='Item',
             message='Company not found.'
         )
-
-        # Permission check
-        if not is_company_owner(email, company_id):
-            raise HTTPException(status_code=403, detail='No permissions')
 
         document = db_response['Item']
         document['salt'] = bytes(document['salt'])
@@ -91,36 +90,32 @@ class CompanyRepository:
     @staticmethod
     def login(credentials: AuthModel, Authorize: AuthJWT = Depends()):
         # Getting user from DB
-        user = get_company_from_db(credentials.login)
+        company = get_company_by_email(credentials.login)
 
         # Verifying password
         if not verify_password(
                 input_password=credentials.password,
-                stored_hashed_password=user.hashed_password,
-                salt=user.salt
+                stored_hashed_password=company.hashed_password,
+                salt=company.salt
         ):
             raise HTTPException(status_code=401, detail="Bad username or password")
 
         # Generating tokens
-        access_token = Authorize.create_access_token(subject=credentials.login)
-        refresh_token = Authorize.create_refresh_token(subject=credentials.login)
+        access_token = Authorize.create_access_token(subject=company.company_id)
+        refresh_token = Authorize.create_refresh_token(subject=company.company_id)
         return {"access_token": access_token, "refresh_token": refresh_token}
 
     @staticmethod
-    def update(company_id: str, model_from_user: CompanyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+    def update(company_id_from_user: str,
+               model_from_user: CompanyUpdate,
+               Authorize: AuthJWT = Depends()) -> JSONResponse:
         Authorize.jwt_required()
-        email = Authorize.get_jwt_subject()
+        company_id_from_token = Authorize.get_jwt_subject()
 
-        db_response = company_table.get_item(
-            Key={
-                'company_id': company_id
-            }
-        )
-        model_from_db = CompanyShortRead(**db_response['Item'])
-        if email != model_from_db.email:
+        if company_id_from_token != company_id_from_user:
             raise HTTPException(status_code=403, detail="You're not allowed to access other companies!")
 
-        update_item_attrs(company_id=company_id, model=model_from_user)
+        update_item_attrs(company_id=company_id_from_user, model=model_from_user)
 
         response = JSONResponse(
             content={
@@ -131,18 +126,18 @@ class CompanyRepository:
         return response
 
     @staticmethod
-    def delete(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+    def delete(company_id_from_user: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         Authorize.jwt_required()
-        email = Authorize.get_jwt_subject()
+        company_id_from_token = Authorize.get_jwt_subject()
 
         # Permission check
-        if not is_company_owner(email, company_id):
+        if company_id_from_token != company_id_from_user:
             raise HTTPException(status_code=403, detail='No permissions')
 
         # Querying deletion from DB
         db_response = company_table.delete_item(
             Key={
-                'company_id': company_id
+                'company_id': company_id_from_user
             }
         )
 
@@ -150,12 +145,12 @@ class CompanyRepository:
         if 'ConsumedCapacity' in db_response:
             raise HTTPException(
                 status_code=404,
-                detail='CV not found.'
+                detail='Company not found.'
             )
 
         # Response
         response = JSONResponse(
-                content="CV successfully deleted!",
+                content="Company successfully deleted!",
                 status_code=status.HTTP_200_OK
             )
         return response

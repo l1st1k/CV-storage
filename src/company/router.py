@@ -27,7 +27,7 @@ class CompanyRouter:
 
     @staticmethod
     async def get_company(company_id: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
-        return CompanyRepository.get(company_id=company_id, Authorize=Authorize)
+        return CompanyRepository.get(company_id_from_user=company_id, Authorize=Authorize)
 
     @staticmethod
     async def register_company(name: str, email: str, password: str, photo: UploadFile = File()) -> JSONResponse:
@@ -47,7 +47,7 @@ class CompanyRouter:
 
     @staticmethod
     async def update_company(company_id: str, model: CompanyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        return CompanyRepository.update(company_id=company_id, model_from_user=model, Authorize=Authorize)
+        return CompanyRepository.update(company_id_from_user=company_id, model_from_user=model, Authorize=Authorize)
 
     @staticmethod
     async def delete_company(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
