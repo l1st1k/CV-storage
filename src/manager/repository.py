@@ -8,7 +8,8 @@ from company.services import get_company_by_id
 from core.database import manager_table
 from core.services_auth import AuthModel
 from manager.models import *
-from manager.services import select_companys_managers, create_manager_model
+from manager.permissions import manager_itself_or_related_company
+from manager.services import select_companys_managers, create_manager_model, get_manager_by_id
 
 
 class ManagerRepository:
@@ -18,7 +19,7 @@ class ManagerRepository:
         company_id_from_token = Authorize.get_jwt_subject()
 
         # Scanning DB
-        list_of_managers = select_companys_managers(company_id=company_id_from_token)
+        list_of_managers: ManagersRead = select_companys_managers(company_id=company_id_from_token)
 
         return list_of_managers
 
@@ -47,3 +48,16 @@ class ManagerRepository:
             },
             status_code=status.HTTP_201_CREATED)
         return response
+
+    @staticmethod
+    def get(manager_id_from_user: str, Authorize: AuthJWT = Depends()) -> ManagerInsertAndFullRead:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+
+        # Getting manager from DB
+        manager: ManagerInsertAndFullRead = get_manager_by_id(manager_id=manager_id_from_user)
+
+        # Permissions check
+        manager_itself_or_related_company(id_from_token=id_from_token, manager=manager)
+
+        return manager
