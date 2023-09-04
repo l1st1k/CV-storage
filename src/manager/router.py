@@ -18,7 +18,7 @@ class ManagerRouter:
         self.app.get("/managers", response_model=ManagersRead, tags=self.tags)(self.list_managers)
         self.app.get("/manager/{manager_id}", response_model=ManagerInsertAndFullRead, tags=self.tags)(self.get_manager)
         self.app.post("/register_manager", response_class=JSONResponse, tags=self.tags)(self.register_manager)
-        # self.app.post("/login_as_company", response_class=JSONResponse, tags=self.tags)(self.login_as_company)
+        self.app.post("/login_as_manager", response_class=JSONResponse, tags=self.tags)(self.login_as_manager)
         # self.app.patch("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.update_company)
         # self.app.delete("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.delete_company)
 
@@ -37,3 +37,11 @@ class ManagerRouter:
             password=password
         )
         return ManagerRepository.create(credentials=credentials, Authorize=Authorize)
+
+    @staticmethod
+    async def login_as_manager(login: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        credentials = AuthModel(
+            login=login,
+            password=password
+        )
+        return ManagerRepository.login(credentials=credentials, Authorize=Authorize)

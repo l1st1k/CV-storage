@@ -1,6 +1,5 @@
 import logging
 from base64 import b64encode
-from typing import Optional
 
 from boto3.dynamodb.conditions import Attr
 from fastapi import UploadFile, HTTPException
@@ -49,7 +48,7 @@ def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -
     )
 
 
-def get_company_by_email(email: str) -> Optional[CompanyInsertAndFullRead]:
+def get_company_by_email(email: str) -> CompanyInsertAndFullRead:
     response = company_table.scan(
         FilterExpression=Attr('email').eq(email)
     )

@@ -13,6 +13,7 @@ __all__ = (
     'create_manager_model',
     'get_manager_by_id',
     'add_manager_to_company_model',
+    'get_manager_by_email',
 )
 
 
@@ -74,3 +75,18 @@ def add_manager_to_company_model(company: CompanyInsertAndFullRead, manager: Man
             ":managers": existing_managers
         }
     )
+
+
+def get_manager_by_email(email: str) -> ManagerInsertAndFullRead:
+    response = manager_table.scan(
+        FilterExpression=Attr('email').eq(email)
+    )
+    items = response['Items']
+    if items:
+        # Assuming we only expect one item matching the email
+        document = items[0]
+        document['salt'] = bytes(document['salt'])
+        document['hashed_password'] = bytes(document['hashed_password'])
+        return ManagerInsertAndFullRead(**document)
+    else:
+        raise HTTPException(status_code=401, detail='You entered wrong email!')

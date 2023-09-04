@@ -51,4 +51,4 @@ class CompanyRouter:
 
     @staticmethod
     async def delete_company(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        return CompanyRepository.delete(company_id=company_id, Authorize=Authorize)
+        return CompanyRepository.delete(company_id_from_user=company_id, Authorize=Authorize)
