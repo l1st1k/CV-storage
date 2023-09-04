@@ -65,7 +65,6 @@ def get_company_by_email(email: str) -> Optional[CompanyInsertAndFullRead]:
 
 
 def get_company_by_id(company_id: str) -> CompanyInsertAndFullRead:
-    # TODO DRY
     response = company_table.get_item(
         Key={
             'company_id': company_id

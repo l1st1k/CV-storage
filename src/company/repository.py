@@ -7,7 +7,7 @@ from fastapi_jwt_auth import AuthJWT
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
 from company.services import (check_photo_type, create_company_model,
-                              get_company_by_email, update_item_attrs)
+                              get_company_by_email, update_item_attrs, get_company_by_id)
 from core.database import company_table
 from core.services_auth import AuthModel, verify_password
 from core.services_general import check_for_404, check_for_404_with_item
@@ -37,23 +37,8 @@ class CompanyRepository:
         if company_id_from_token != company_id_from_user:
             raise HTTPException(status_code=403, detail='No permissions')
 
-        db_response = company_table.get_item(
-            Key={
-                'company_id': company_id_from_user
-            }
-        )
-
-        # 404 validation
-        check_for_404_with_item(
-            container=db_response,
-            item='Item',
-            message='Company not found.'
-        )
-
-        document = db_response['Item']
-        document['salt'] = bytes(document['salt'])
-        document['hashed_password'] = bytes(document['hashed_password'])
-        return CompanyInsertAndFullRead(**document)
+        company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id_from_token)
+        return company
 
     @staticmethod
     def create(name: str, credentials: AuthModel, photo: UploadFile) -> JSONResponse:
