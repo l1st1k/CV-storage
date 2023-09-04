@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from fastapi import UploadFile
 from pydantic import BaseModel, Field
@@ -57,7 +57,7 @@ class CompanyUpdate(BaseModel):
     email: Optional[str] = CompanyFields.email
     new_password: Optional[str] = CompanyFields.new_password
     new_photo: Optional[UploadFile] = CompanyFields.new_photo
-    managers: Optional[set] = CompanyFields.managers
+    managers: Optional[Set[str]] = CompanyFields.managers
 
 
 class CompanyInsertAndFullRead(BaseModel):
@@ -67,7 +67,7 @@ class CompanyInsertAndFullRead(BaseModel):
     email: str = CompanyFields.email
     hashed_password: bytes = CompanyFields.hashed_password
     salt: bytes = CompanyFields.salt
-    managers: Optional[set] = CompanyFields.managers
+    managers: Optional[Set[str]] = CompanyFields.managers
     logo_in_bytes: str = CompanyFields.logo_in_bytes
 
 
@@ -76,7 +76,7 @@ class CompanyShortRead(BaseModel):
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name
     email: str = CompanyFields.email
-    managers: Optional[set] = CompanyFields.managers
+    managers: Optional[Set[str]] = CompanyFields.managers
 
 
 CompaniesRead = List[CompanyShortRead]

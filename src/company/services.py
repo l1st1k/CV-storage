@@ -64,7 +64,8 @@ def get_company_by_email(email: str) -> Optional[CompanyInsertAndFullRead]:
         raise HTTPException(status_code=401, detail='You entered wrong email!')
 
 
-def get_company_by_id(company_id: str) -> Optional[CompanyInsertAndFullRead]:
+def get_company_by_id(company_id: str) -> CompanyInsertAndFullRead:
+    # TODO DRY
     response = company_table.get_item(
         Key={
             'company_id': company_id
@@ -79,6 +80,8 @@ def get_company_by_id(company_id: str) -> Optional[CompanyInsertAndFullRead]:
     )
 
     document = response['Item']
+    document['salt'] = bytes(document['salt'])
+    document['hashed_password'] = bytes(document['hashed_password'])
     return CompanyInsertAndFullRead(**document)
 
 

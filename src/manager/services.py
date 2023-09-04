@@ -1,8 +1,9 @@
 from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
+from company.models import CompanyInsertAndFullRead
 from company.services import get_company_by_id
-from core.database import manager_table
+from core.database import manager_table, company_table
 from core.services_auth import hash_password, AuthModel
 from core.services_general import get_uuid, check_for_404_with_item
 from manager.models import *
@@ -11,6 +12,7 @@ __all__ = (
     'select_companys_managers',
     'create_manager_model',
     'get_manager_by_id',
+    'add_manager_to_company_model',
 )
 
 
@@ -55,3 +57,18 @@ def get_manager_by_id(manager_id: str) -> ManagerInsertAndFullRead:
 
     document = response['Item']
     return ManagerInsertAndFullRead(**document)
+
+
+def add_manager_to_company_model(company: CompanyInsertAndFullRead, manager: ManagerInsertAndFullRead) -> None:
+    # Querying the existing managers
+    existing_managers = company.managers if company.managers else set()
+    existing_managers.add(manager.manager_id)  # Add the new manager's ID
+
+    # Update the managers attribute in DynamoDB
+    company_table.update_item(
+        Key={'company_id': company.company_id},
+        UpdateExpression="SET managers = :managers",
+        ExpressionAttributeValues={
+            ":managers": existing_managers
+        }
+    )

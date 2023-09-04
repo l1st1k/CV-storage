@@ -4,12 +4,14 @@ from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
+from company.models import CompanyInsertAndFullRead
 from company.services import get_company_by_id
 from core.database import manager_table
 from core.services_auth import AuthModel
 from manager.models import *
 from manager.permissions import manager_itself_or_related_company
-from manager.services import select_companys_managers, create_manager_model, get_manager_by_id
+from manager.services import select_companys_managers, create_manager_model, get_manager_by_id, \
+    add_manager_to_company_model
 
 
 class ManagerRepository:
@@ -29,13 +31,14 @@ class ManagerRepository:
         company_id_from_token = Authorize.get_jwt_subject()
 
         # Model creation
-        model = create_manager_model(company_id_from_token, credentials)
+        model: ManagerInsertAndFullRead = create_manager_model(company_id_from_token, credentials)
 
         # Database logic
         manager_table.put_item(Item=dict(model))
+        company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id_from_token)
+        add_manager_to_company_model(company=company, manager=model)
 
         # Logging
-        company = get_company_by_id(company_id=company_id_from_token)
         logging.info(f"Company '{company.company_name}' registered new manager: '{credentials.login}'!")
 
         # Response
