@@ -7,7 +7,7 @@ from fastapi_jwt_auth import AuthJWT
 from company.models import (CompaniesRead, CompanyInsertAndFullRead,
                             CompanyShortRead, CompanyUpdate)
 from company.services import (check_photo_type, create_company_model,
-                              get_company_by_email, update_item_attrs, get_company_by_id)
+                              get_company_by_email, update_company_model, get_company_by_id)
 from core.database import company_table
 from core.services_auth import AuthModel, verify_password
 from core.services_general import check_for_404, check_for_404_with_item
@@ -97,11 +97,14 @@ class CompanyRepository:
         Authorize.jwt_required()
         company_id_from_token = Authorize.get_jwt_subject()
 
+        # Permission check
         if company_id_from_token != company_id_from_user:
             raise HTTPException(status_code=403, detail="You're not allowed to access other companies!")
 
-        update_item_attrs(company_id=company_id_from_user, model=model_from_user)
+        # Database logic
+        update_company_model(company_id=company_id_from_user, model=model_from_user)
 
+        # Response
         response = JSONResponse(
             content={
                 "message": "Company's profile updated successfully!"

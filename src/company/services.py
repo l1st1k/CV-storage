@@ -14,7 +14,7 @@ __all__ = (
     'create_company_model',
     'get_company_by_email',
     'get_company_by_id',
-    'update_item_attrs',
+    'update_company_model',
 )
 
 
@@ -83,7 +83,7 @@ def get_company_by_id(company_id: str) -> CompanyInsertAndFullRead:
     return CompanyInsertAndFullRead(**document)
 
 
-def update_item_attrs(company_id: str, model: CompanyUpdate):
+def update_company_model(company_id: str, model: CompanyUpdate):
     """Updates company model in database"""
     # Init expressions for DynamoDB update
     update_expression = "set"
