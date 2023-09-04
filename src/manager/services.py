@@ -56,6 +56,8 @@ def get_manager_by_id(manager_id: str) -> ManagerInsertAndFullRead:
     )
 
     document = response['Item']
+    document['salt'] = bytes(document['salt'])
+    document['hashed_password'] = bytes(document['hashed_password'])
     return ManagerInsertAndFullRead(**document)
 
 

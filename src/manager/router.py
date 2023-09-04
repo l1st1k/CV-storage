@@ -16,7 +16,7 @@ class ManagerRouter:
     def configure_routes(self):
         pass
         self.app.get("/managers", response_model=ManagersRead, tags=self.tags)(self.list_managers)
-        # self.app.get("/company/{company_id}", response_model=CompanyInsertAndFullRead, tags=self.tags)(self.get_company)
+        self.app.get("/manager/{manager_id}", response_model=ManagerInsertAndFullRead, tags=self.tags)(self.get_manager)
         self.app.post("/register_manager", response_class=JSONResponse, tags=self.tags)(self.register_manager)
         # self.app.post("/login_as_company", response_class=JSONResponse, tags=self.tags)(self.login_as_company)
         # self.app.patch("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.update_company)
@@ -25,6 +25,10 @@ class ManagerRouter:
     @staticmethod
     async def list_managers(Authorize: AuthJWT = Depends()) -> ManagersRead:
         return ManagerRepository.list(Authorize=Authorize)
+
+    @staticmethod
+    async def get_manager(manager_id: str, Authorize: AuthJWT = Depends()) -> ManagerInsertAndFullRead:
+        return ManagerRepository.get(manager_id_from_user=manager_id, Authorize=Authorize)
 
     @staticmethod
     async def register_manager(email: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
