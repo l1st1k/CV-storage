@@ -10,8 +10,7 @@ from core.database import manager_table
 from core.services_auth import AuthModel, verify_password
 from manager.models import *
 from manager.permissions import manager_itself_or_related_company
-from manager.services import select_companys_managers, create_manager_model, get_manager_by_id, \
-    add_manager_to_company_model, get_manager_by_email
+from manager.services import *
 
 
 class ManagerRepository:
@@ -89,4 +88,46 @@ class ManagerRepository:
                 "refresh_token": refresh_token
             },
             status_code=status.HTTP_200_OK)
+        return response
+
+    @staticmethod
+    def update(manager_id_from_user: str,
+               model_from_user: ManagerUpdate,
+               Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+
+        # Getting manager from DB
+        manager: ManagerInsertAndFullRead = get_manager_by_id(manager_id=manager_id_from_user)
+
+        # Permissions check
+        manager_itself_or_related_company(id_from_token=id_from_token, manager=manager)
+
+        update_manager_model(manager_id=manager_id_from_user, model=model_from_user)
+
+        response = JSONResponse(
+            content={
+                "message": "Manager's profile updated successfully!"
+            },
+            status_code=status.HTTP_200_OK
+        )
+        return response
+
+    @staticmethod
+    def delete(manager_id_from_user: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        company_id_from_token = Authorize.get_jwt_subject()
+
+        # Permission check
+        manager: ManagerInsertAndFullRead = get_manager_by_id(manager_id=manager_id_from_user)
+        if company_id_from_token != manager.company_id:
+            raise HTTPException(status_code=403, detail='No permissions')
+
+        delete_manager_model(manager_id=manager_id_from_user)
+
+        # Response
+        response = JSONResponse(
+            content="Manager successfully deleted!",
+            status_code=status.HTTP_200_OK
+        )
         return response

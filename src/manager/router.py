@@ -19,8 +19,8 @@ class ManagerRouter:
         self.app.get("/manager/{manager_id}", response_model=ManagerInsertAndFullRead, tags=self.tags)(self.get_manager)
         self.app.post("/register_manager", response_class=JSONResponse, tags=self.tags)(self.register_manager)
         self.app.post("/login_as_manager", response_class=JSONResponse, tags=self.tags)(self.login_as_manager)
-        # self.app.patch("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.update_company)
-        # self.app.delete("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.delete_company)
+        self.app.patch("/manager/{manager_id}", response_class=JSONResponse, tags=self.tags)(self.update_manager)
+        self.app.delete("/manager/{manager_id}", response_class=JSONResponse, tags=self.tags)(self.delete_manager)
 
     @staticmethod
     async def list_managers(Authorize: AuthJWT = Depends()) -> ManagersRead:
@@ -45,3 +45,11 @@ class ManagerRouter:
             password=password
         )
         return ManagerRepository.login(credentials=credentials, Authorize=Authorize)
+
+    @staticmethod
+    async def update_manager(manager_id: str, model: ManagerUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return ManagerRepository.update(manager_id_from_user=manager_id, model_from_user=model, Authorize=Authorize)
+
+    @staticmethod
+    async def delete_manager(manager_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return ManagerRepository.delete(manager_id_from_user=manager_id, Authorize=Authorize)

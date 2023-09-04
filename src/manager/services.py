@@ -14,6 +14,8 @@ __all__ = (
     'get_manager_by_id',
     'add_manager_to_company_model',
     'get_manager_by_email',
+    'update_manager_model',
+    'delete_manager_model',
 )
 
 
@@ -90,3 +92,51 @@ def get_manager_by_email(email: str) -> ManagerInsertAndFullRead:
         return ManagerInsertAndFullRead(**document)
     else:
         raise HTTPException(status_code=401, detail='You entered wrong email!')
+
+
+def update_manager_model(manager_id: str, model: ManagerUpdate) -> None:
+    """Updates manager model in database"""
+    # Init expressions for DynamoDB update
+    update_expression = "set"
+    expression_attribute_values = {}
+    attributes: dict = model.dict()
+
+    if model.new_password:
+        # Generate unique salt and hash the password
+        hashed_password, salt = hash_password(model.new_password)
+        attributes.pop('new_password')
+        attributes.update({'hashed_password': hashed_password,
+                           'salt': salt})
+
+    # Filling the expressions
+    for key, value in attributes.items():
+        if value:
+            update_expression += f' {key} = :{key},'
+            expression_attribute_values[f':{key}'] = value
+
+    # Cutting the last comma
+    update_expression = update_expression[:-1]
+
+    # Querying the update to DynamoDB
+    response = manager_table.update_item(
+        Key={'manager_id': manager_id},
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values
+    )
+    return response
+
+
+def delete_manager_model(manager_id: str) -> None:
+    # Querying deletion from DB
+    db_response = manager_table.delete_item(
+        Key={
+            'manager_id': manager_id
+        }
+    )
+
+    # 404 validation
+    if 'ConsumedCapacity' in db_response:
+        raise HTTPException(
+            status_code=404,
+            detail='Manager not found.'
+        )
