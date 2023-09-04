@@ -13,6 +13,7 @@ __all__ = (
     'create_manager_model',
     'get_manager_by_id',
     'add_manager_to_company_model',
+    'delete_manager_from_company_model',
     'get_manager_by_email',
     'update_manager_model',
     'delete_manager_model',
@@ -77,6 +78,26 @@ def add_manager_to_company_model(company: CompanyInsertAndFullRead, manager: Man
             ":managers": existing_managers
         }
     )
+
+
+def delete_manager_from_company_model(company_id: str, manager_id: str) -> None:
+    # Retrieve the company by ID
+    company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
+
+    # Check if the company exists and has a managers attribute
+    if company and company.managers:
+        # Remove the manager_id from the set of managers
+        if manager_id in company.managers:
+            company.managers.remove(manager_id)
+
+            # Update the managers attribute in DynamoDB
+            company_table.update_item(
+                Key={'company_id': company.company_id},
+                UpdateExpression="SET managers = :managers",
+                ExpressionAttributeValues={
+                    ":managers": company.managers
+                }
+            )
 
 
 def get_manager_by_email(email: str) -> ManagerInsertAndFullRead:

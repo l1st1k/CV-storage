@@ -123,7 +123,9 @@ class ManagerRepository:
         if company_id_from_token != manager.company_id:
             raise HTTPException(status_code=403, detail='No permissions')
 
+        # Database logic
         delete_manager_model(manager_id=manager_id_from_user)
+        delete_manager_from_company_model(company_id=company_id_from_token, manager_id=manager_id_from_user)
 
         # Response
         response = JSONResponse(
