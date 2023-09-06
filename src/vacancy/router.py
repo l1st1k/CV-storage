@@ -17,7 +17,7 @@ class VacancyRouter:
         pass
         self.app.get("/vacancies", response_model=VacanciesRead, tags=self.tags)(self.list_vacancies)
         self.app.get("/vacancy/{vacancy_id}", response_model=VacancyInsertAndFullRead, tags=self.tags)(self.get_vacancy)
-        self.app.post("/register_vacancy", response_class=JSONResponse, tags=self.tags)(self.register_vacancy)
+        self.app.post("/add_vacancy", response_class=JSONResponse, tags=self.tags)(self.add_vacancy)
         self.app.patch("/vacancy/{vacancy_id}", response_class=JSONResponse, tags=self.tags)(self.update_vacancy)
         self.app.delete("/vacancy/{vacancy_id}", response_class=JSONResponse, tags=self.tags)(self.delete_vacancy)
 
@@ -30,7 +30,7 @@ class VacancyRouter:
         return VacancyRepository.get(vacancy_id_from_user=vacancy_id, Authorize=Authorize)
 
     @staticmethod
-    async def register_vacancy(email: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+    async def add_vacancy(email: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         credentials = AuthModel(
             login=email,
             password=password
