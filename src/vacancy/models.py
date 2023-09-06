@@ -17,6 +17,12 @@ class VacancyFields:
         min_length=36,
         max_length=36
     )
+    company_id = Field(
+        description="ID of the company, that owns vacancy",
+        example="3422b448-2460-4fd2-9183-8000de6f8343",
+        min_length=36,
+        max_length=36
+    )
     major = Field(
         description="Job specialization",
         example='Software engineer'
@@ -39,6 +45,7 @@ class VacancyUpdate(BaseModel):
 
 class VacancyShortRead(BaseModel):
     vacancy_id: str = VacancyFields.vacancy_id
+    company_id: str = VacancyFields.company_id
     major: str = VacancyFields.major
     years_of_exp: int = VacancyFields.years_of_exp
 

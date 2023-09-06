@@ -16,8 +16,7 @@ class CompanyFields:
         description="Unique identifier of this Company in the database",
         example="3422b448-2460-4fd2-9183-8000de6f8343",
         min_length=36,
-        max_length=36,
-        default=None
+        max_length=36
     )
     company_name = Field(
         description="Name of the company",
@@ -27,6 +26,11 @@ class CompanyFields:
     managers = Field(
         description="Set of company HR-managers ids",
         example={"manager1_id", "manager2_id", "manager3_id"},
+        default=None
+    )
+    vacancies = Field(
+        description="Set of company Vacancies ids",
+        example={"vacancy1_id", "vacancy2_id", "vacancy3_id"},
         default=None
     )
     logo_in_bytes = Field(
@@ -58,6 +62,7 @@ class CompanyUpdate(BaseModel):
     new_password: Optional[str] = CompanyFields.new_password
     new_photo: Optional[UploadFile] = CompanyFields.new_photo
     managers: Optional[Set[str]] = CompanyFields.managers
+    vacancies: Optional[Set[str]] = CompanyFields.vacancies
 
 
 class CompanyInsertAndFullRead(BaseModel):
@@ -68,6 +73,7 @@ class CompanyInsertAndFullRead(BaseModel):
     hashed_password: bytes = CompanyFields.hashed_password
     salt: bytes = CompanyFields.salt
     managers: Optional[Set[str]] = CompanyFields.managers
+    vacancies: Optional[Set[str]] = CompanyFields.vacancies
     logo_in_bytes: str = CompanyFields.logo_in_bytes
 
 
