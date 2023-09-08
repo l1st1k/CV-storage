@@ -14,7 +14,6 @@ class VacancyRouter:
         self.app = app
 
     def configure_routes(self):
-        pass
         self.app.get("/vacancies", response_model=VacanciesRead, tags=self.tags)(self.list_vacancies)
         self.app.get("/vacancy/{vacancy_id}", response_model=VacancyInsertAndFullRead, tags=self.tags)(self.get_vacancy)
         self.app.post("/add_vacancy", response_class=JSONResponse, tags=self.tags)(self.add_vacancy)

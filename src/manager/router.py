@@ -14,7 +14,6 @@ class ManagerRouter:
         self.app = app
 
     def configure_routes(self):
-        pass
         self.app.get("/managers", response_model=ManagersRead, tags=self.tags)(self.list_managers)
         self.app.get("/manager/{manager_id}", response_model=ManagerInsertAndFullRead, tags=self.tags)(self.get_manager)
         self.app.post("/register_manager", response_class=JSONResponse, tags=self.tags)(self.register_manager)

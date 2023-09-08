@@ -3,11 +3,13 @@ from fastapi import HTTPException
 
 from company.services import get_company_by_id
 from core.database import vacancy_table, manager_table, company_table
+from core.services_general import check_for_404_with_item
 from vacancy.models import *
 
 __all__ = (
     'get_company_id',
     'select_companys_vacancies',
+    'get_vacancy_by_id',
 )
 
 
@@ -42,3 +44,21 @@ def select_companys_vacancies(company_id: str) -> VacanciesRead:
     else:
         company = get_company_by_id(company_id=company_id)
         raise HTTPException(status_code=404, detail=f'There are no any vacancies in {company.company_name}.')
+
+
+def get_vacancy_by_id(vacancy_id: str) -> VacancyInsertAndFullRead:
+    response = vacancy_table.get_item(
+        Key={
+            'vacancy_id': vacancy_id
+        }
+    )
+
+    # 404 validation
+    check_for_404_with_item(
+        container=response,
+        item='Item',
+        message='Company not found.'
+    )
+
+    document = response['Item']
+    return VacancyInsertAndFullRead(**document)
