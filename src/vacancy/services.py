@@ -1,6 +1,7 @@
 from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
+from company.models import CompanyInsertAndFullRead
 from company.services import get_company_by_id
 from core.database import vacancy_table, manager_table, company_table
 from core.services_general import check_for_404_with_item
@@ -11,6 +12,8 @@ __all__ = (
     'select_companys_vacancies',
     'get_vacancy_by_id',
     'update_vacancy_model',
+    'delete_vacancy_model',
+    'delete_vacancy_from_company_model',
 )
 
 
@@ -88,3 +91,39 @@ def update_vacancy_model(vacancy_id: str, model: VacancyUpdate) -> None:
         ExpressionAttributeValues=expression_attribute_values
     )
     return response
+
+
+def delete_vacancy_model(vacancy_id: str) -> None:
+    # Querying deletion from DB
+    db_response = vacancy_table.delete_item(
+        Key={
+            'vacancy_id': vacancy_id
+        }
+    )
+
+    # 404 validation
+    if 'ConsumedCapacity' in db_response:
+        raise HTTPException(
+            status_code=404,
+            detail='Vacancy not found.'
+        )
+
+
+def delete_vacancy_from_company_model(company_id: str, vacancy_id: str) -> None:
+    # Retrieve the company by ID
+    company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
+
+    # Check if the company exists and has a vacancies attribute
+    if company and company.managers:
+        # Remove the vacancy_id from the set of vacancies
+        if vacancy_id in company.vacancies:
+            company.vacancies.remove(vacancy_id)
+
+            # Update the vacancies attribute in DynamoDB
+            company_table.update_item(
+                Key={'company_id': company.company_id},
+                UpdateExpression="SET vacancies = :vacancies",
+                ExpressionAttributeValues={
+                    ":vacancies": company.vacancies
+                }
+            )

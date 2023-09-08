@@ -37,4 +37,4 @@ class VacancyRouter:
 
     @staticmethod
     async def delete_vacancy(vacancy_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        return VacancyRepository.delete(vacancy_id_from_user=vacancy_id, Authorize=Authorize)
+        return VacancyRepository.delete(vacancy_id=vacancy_id, Authorize=Authorize)
