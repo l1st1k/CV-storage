@@ -1,10 +1,9 @@
-import logging
-
 from fastapi import Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from core.database import vacancy_table
+from core.services_general import get_uuid
 from vacancy.models import *
 from vacancy.services import *
 
@@ -40,3 +39,35 @@ class VacancyRepository:
             raise HTTPException(status_code=403, detail="You're not allowed to access this vacancy!")
 
         return vacancy
+
+    @staticmethod
+    def create(data: VacancyCreate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        """Creates vacancy and returns its id"""
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+
+        # Getting company_id
+        company_id = get_company_id(id_from_token=id_from_token)
+
+        # Creating model
+        model = VacancyInsertAndFullRead(
+            vacancy_id=get_uuid(),
+            company_id=company_id,
+            major=data.major,
+            years_of_exp=data.years_of_exp,
+            skills=data.skills
+        )
+
+        # Database logic
+        vacancy_table.put_item(Item=dict(model))
+
+        # Response
+        response = JSONResponse(
+            content={
+                "message": f"New vacancy added successfully!",
+                "vacancy_id": model.vacancy_id,
+                "company_id": model.company_id
+            },
+            status_code=status.HTTP_201_CREATED)
+
+        return response

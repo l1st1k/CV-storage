@@ -2,7 +2,6 @@ from fastapi import Depends
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from core.services_auth import AuthModel
 from vacancy.models import *
 from vacancy.repository import VacancyRepository
 
@@ -29,12 +28,8 @@ class VacancyRouter:
         return VacancyRepository.get(vacancy_id_from_user=vacancy_id, Authorize=Authorize)
 
     @staticmethod
-    async def add_vacancy(email: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        credentials = AuthModel(
-            login=email,
-            password=password
-        )
-        return VacancyRepository.create(credentials=credentials, Authorize=Authorize)
+    async def add_vacancy(data: VacancyCreate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return VacancyRepository.create(data=data, Authorize=Authorize)
 
     @staticmethod
     async def update_vacancy(vacancy_id: str, model: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
