@@ -10,6 +10,7 @@ __all__ = (
     'get_company_id',
     'select_companys_vacancies',
     'get_vacancy_by_id',
+    'update_vacancy_model',
 )
 
 
@@ -62,3 +63,28 @@ def get_vacancy_by_id(vacancy_id: str) -> VacancyInsertAndFullRead:
 
     document = response['Item']
     return VacancyInsertAndFullRead(**document)
+
+
+def update_vacancy_model(vacancy_id: str, model: VacancyUpdate) -> None:
+    """Updates vacancy model in database"""
+    # Init expressions for DynamoDB update
+    update_expression = "set"
+    expression_attribute_values = {}
+    attributes: dict = model.dict()
+
+    # Filling the expressions
+    for key, value in attributes.items():
+        if value:
+            update_expression += f' {key} = :{key},'
+            expression_attribute_values[f':{key}'] = value
+
+    # Cutting the last comma
+    update_expression = update_expression[:-1]
+
+    # Querying the update to DynamoDB
+    response = vacancy_table.update_item(
+        Key={'vacancy_id': vacancy_id},
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values
+    )
+    return response

@@ -33,7 +33,7 @@ class VacancyRouter:
 
     @staticmethod
     async def update_vacancy(vacancy_id: str, model: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        return VacancyRepository.update(vacancy_id_from_user=vacancy_id, model_from_user=model, Authorize=Authorize)
+        return VacancyRepository.update(vacancy_id=vacancy_id, new_model=model, Authorize=Authorize)
 
     @staticmethod
     async def delete_vacancy(vacancy_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:

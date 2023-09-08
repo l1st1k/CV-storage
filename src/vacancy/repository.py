@@ -31,7 +31,7 @@ class VacancyRepository:
         # Getting company_id
         company_id = get_company_id(id_from_token=id_from_token)
 
-        # Getting manager from DB
+        # Getting vacancy from DB
         vacancy: VacancyInsertAndFullRead = get_vacancy_by_id(vacancy_id=vacancy_id_from_user)
         
         # Permission check
@@ -70,4 +70,29 @@ class VacancyRepository:
             },
             status_code=status.HTTP_201_CREATED)
 
+        return response
+
+    @staticmethod
+    def update(vacancy_id: str, new_model: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+
+        # Getting company_id
+        company_id = get_company_id(id_from_token=id_from_token)
+        # Getting vacancy from DB
+        vacancy: VacancyInsertAndFullRead = get_vacancy_by_id(vacancy_id=vacancy_id)
+
+        # Permission check
+        if company_id != vacancy.company_id:
+            raise HTTPException(status_code=403, detail="You're not allowed to access this vacancy!")
+
+        # Database update
+        update_vacancy_model(vacancy_id=vacancy_id, model=new_model)
+
+        response = JSONResponse(
+            content={
+                "message": "Vacancy updated successfully!"
+            },
+            status_code=status.HTTP_200_OK
+        )
         return response
