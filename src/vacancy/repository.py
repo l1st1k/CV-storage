@@ -2,6 +2,8 @@ from fastapi import Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
+from company.models import CompanyInsertAndFullRead
+from company.services import get_company_by_id
 from core.database import vacancy_table
 from core.services_general import get_uuid
 from vacancy.models import *
@@ -60,6 +62,8 @@ class VacancyRepository:
 
         # Database logic
         vacancy_table.put_item(Item=dict(model))
+        company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
+        add_vacancy_to_company_model(company=company, vacancy_id=model.vacancy_id)
 
         # Response
         response = JSONResponse(

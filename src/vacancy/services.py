@@ -11,6 +11,7 @@ __all__ = (
     'get_company_id',
     'select_companys_vacancies',
     'get_vacancy_by_id',
+    'add_vacancy_to_company_model',
     'update_vacancy_model',
     'delete_vacancy_model',
     'delete_vacancy_from_company_model',
@@ -66,6 +67,21 @@ def get_vacancy_by_id(vacancy_id: str) -> VacancyInsertAndFullRead:
 
     document = response['Item']
     return VacancyInsertAndFullRead(**document)
+
+
+def add_vacancy_to_company_model(company: CompanyInsertAndFullRead, vacancy_id: str) -> None:
+    # Querying the existing vacancies
+    existing_vacancies = company.vacancies if company.vacancies else set()
+    existing_vacancies.add(vacancy_id)  # Add the new vacancy's ID
+
+    # Update the vacancies attribute in DynamoDB
+    company_table.update_item(
+        Key={'company_id': company.company_id},
+        UpdateExpression="SET vacancies = :vacancies",
+        ExpressionAttributeValues={
+            ":vacancies": existing_vacancies
+        }
+    )
 
 
 def update_vacancy_model(vacancy_id: str, model: VacancyUpdate) -> None:
