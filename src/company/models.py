@@ -82,7 +82,6 @@ class CompanyShortRead(BaseModel):
     company_id: str = CompanyFields.company_id
     company_name: str = CompanyFields.company_name
     email: str = CompanyFields.email
-    managers: Optional[Set[str]] = CompanyFields.managers
 
 
 CompaniesRead = List[CompanyShortRead]
