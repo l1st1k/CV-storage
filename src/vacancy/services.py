@@ -101,12 +101,11 @@ def update_vacancy_model(vacancy_id: str, model: VacancyUpdate) -> None:
     update_expression = update_expression[:-1]
 
     # Querying the update to DynamoDB
-    response = vacancy_table.update_item(
+    vacancy_table.update_item(
         Key={'vacancy_id': vacancy_id},
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values
     )
-    return response
 
 
 def delete_vacancy_model(vacancy_id: str) -> None:
@@ -130,10 +129,12 @@ def delete_vacancy_from_company_model(company_id: str, vacancy_id: str) -> None:
     company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
 
     # Check if the company exists and has a vacancies attribute
-    if company and company.managers:
+    if company and company.vacancies:
         # Remove the vacancy_id from the set of vacancies
         if vacancy_id in company.vacancies:
             company.vacancies.remove(vacancy_id)
+            # If set is empty - we set None
+            company.vacancies = None if not company.vacancies else company.vacancies
 
             # Update the vacancies attribute in DynamoDB
             company_table.update_item(

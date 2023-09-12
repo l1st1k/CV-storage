@@ -89,6 +89,8 @@ def delete_manager_from_company_model(company_id: str, manager_id: str) -> None:
         # Remove the manager_id from the set of managers
         if manager_id in company.managers:
             company.managers.remove(manager_id)
+            # If set is empty - we set None
+            company.managers = None if not company.managers else company.managers
 
             # Update the managers attribute in DynamoDB
             company_table.update_item(
