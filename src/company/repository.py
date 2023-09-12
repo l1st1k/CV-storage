@@ -1,5 +1,6 @@
 import logging
 
+from botocore.exceptions import ClientError
 from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
@@ -51,7 +52,10 @@ class CompanyRepository:
             model = create_company_model(name, credentials, photo)
 
             # Database logic
-            company_table.put_item(Item=dict(model))
+            try:
+                company_table.put_item(Item=dict(model))
+            except ClientError:
+                raise HTTPException(status_code=413, detail="Photo is too large, please choose smaller one!")
 
             # Logging
             logging.info(f"New Company registered: {name}")
