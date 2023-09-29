@@ -20,6 +20,13 @@ class CVFields:
         max_length=36,
         default=None
     )
+    company_id = Field(
+        description="ID for the parent company",
+        example="3422b448-2460-5fd2-9183-8999de6f8343",
+        min_length=36,
+        max_length=36,
+        default=None
+    )
     first_name = Field(
         description="First name",
         example="Afrodita"
@@ -85,12 +92,14 @@ class CVInsertIntoDB(CVUpdate):
     phone_number: str = CVFields.phone_number
     skills: str = CVFields.skills
     cv_id: str = CVFields.cv_id
+    company_id: str = CVFields.company_id
     cv_in_bytes: bytes = CVFields.cv_in_bytes
 
 
 class CVShortRead(BaseModel):
     """Body of CV 'GET' list requests"""
     cv_id: str = CVFields.cv_id
+    company_id: str = CVFields.company_id
     first_name: str = CVFields.first_name
     last_name: str = CVFields.last_name
     age: int = CVFields.age
@@ -104,6 +113,7 @@ CVsRead = List[CVShortRead]
 class CVFullRead(BaseModel):
     """Body of CV GET requests"""
     cv_id: str = CVFields.cv_id
+    company_id: str = CVFields.company_id
     first_name: str = CVFields.first_name
     last_name: str = CVFields.last_name
     age: int = CVFields.age

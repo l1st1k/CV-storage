@@ -33,6 +33,11 @@ class CompanyFields:
         example={"vacancy1_id", "vacancy2_id", "vacancy3_id"},
         default=None
     )
+    cvs = Field(
+        description="Set of company stored CV ids",
+        example={"cv1_id", "cv2_id", "cv3_id"},
+        default=None
+    )
     logo_in_bytes = Field(
         description='Company logo encoded into base64',
         default=None
@@ -63,6 +68,7 @@ class CompanyUpdate(BaseModel):
     new_photo: Optional[UploadFile] = CompanyFields.new_photo
     managers: Optional[Set[str]] = CompanyFields.managers
     vacancies: Optional[Set[str]] = CompanyFields.vacancies
+    cvs: Optional[Set[str]] = CompanyFields.cvs
 
 
 class CompanyInsertAndFullRead(BaseModel):
@@ -74,6 +80,7 @@ class CompanyInsertAndFullRead(BaseModel):
     salt: bytes = CompanyFields.salt
     managers: Optional[Set[str]] = CompanyFields.managers
     vacancies: Optional[Set[str]] = CompanyFields.vacancies
+    cvs: Optional[Set[str]] = CompanyFields.cvs
     logo_in_bytes: str = CompanyFields.logo_in_bytes
 
 

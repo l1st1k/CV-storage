@@ -1,13 +1,18 @@
 import logging
 from base64 import b64encode
 
+from fastapi_jwt_auth import AuthJWT
+
+from company.models import CompanyInsertAndFullRead
+from company.services import get_company_by_id
 from core.database import cv_table
-from fastapi import HTTPException, UploadFile, status
+from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
 from core.services_general import check_for_404, check_for_404_with_item, get_uuid
 
 from cv.models import *
 from cv.services import *
+from vacancy.services import get_company_id
 
 __all__ = (
     'CVRepository',
@@ -16,14 +21,15 @@ __all__ = (
 
 class CVRepository:
     @staticmethod
-    def list() -> CVsRead:
+    def list(Authorize: AuthJWT = Depends()) -> CVsFullRead:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id: str = get_company_id(id_from_token=id_from_token)
+
         # Scanning DB
-        response = cv_table.scan()
+        list_of_cvs: CVsFullRead = select_companys_cvs(company_id=company_id)
 
-        # Empty DB validation
-        check_for_404(response['Items'], message="There is no any CV's in database.")
-
-        return [CVShortRead(**document) for document in response['Items']]
+        return list_of_cvs
 
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
@@ -44,45 +50,50 @@ class CVRepository:
         return CVFullRead(**document)
 
     @staticmethod
-    def create(file: UploadFile) -> JSONResponse:
+    def create(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
         """Uploads a CV and returns its id"""
-        try:
-            # Type check
-            if file and (file.content_type != 'text/csv'):
-                raise TypeError
-            logging.info(f"New CV received: {file.filename}")
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
 
-            # .csv into base 64
-            encoded_string: bytes = b64encode(file.file.read())
+        # Type check
+        if file and (file.content_type != 'text/csv'):
+            raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                                detail="CV should be in .csv format!"
+                                )
 
-            # Writing local .csv
-            b64_to_file(encoded_string)
+        # .csv into base 64
+        encoded_string: bytes = b64encode(file.file.read())
 
-            # Reading .csv into model
-            model = csv_to_model(response_class=CVInsertIntoDB)
-            model.cv_id = get_uuid()
-            model.cv_in_bytes = encoded_string
+        # Writing local .csv
+        b64_to_file(encoded_string)
 
-            # Deleting local .csv
-            clear_csv()
+        # Reading .csv into model
+        model = csv_to_model(response_class=CVInsertIntoDB)
+        model.cv_id = get_uuid()
+        model.cv_in_bytes = encoded_string
 
-            # Database logic
-            cv_table.put_item(Item=dict(model))
+        # Deleting local .csv
+        clear_csv()
 
-            # Response
-            response = JSONResponse(
-                content={
-                    "message": f"New CV uploaded successfully!",
-                    "cv_id": model.cv_id
-                },
-                status_code=status.HTTP_201_CREATED)
-        except TypeError:
-            response = JSONResponse(
-                content={
-                    "message": "CV should be in .csv format!"
-                },
-                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-            )
+        # Database logic
+        company_id: str = get_company_id(id_from_token=id_from_token)
+        model.company_id = company_id
+        cv_table.put_item(Item=dict(model))
+        company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
+        add_cv_to_company_model(company=company, cv=model)
+
+        # Logging
+        logging.info(f"New CV received: {file.filename} for company(id = {company_id})")
+
+        # Response
+        response = JSONResponse(
+            content={
+                "message": f"New CV uploaded successfully!",
+                "cv_id": model.cv_id,
+                "company_id": model.company_id
+            },
+            status_code=status.HTTP_201_CREATED)
+
         return response
 
     @classmethod
@@ -138,26 +149,20 @@ class CVRepository:
         return FileResponse(title)
 
     @staticmethod
-    def delete(cv_id: str) -> JSONResponse:
-        # Querying from DB
-        db_response = cv_table.delete_item(
-            Key={
-                'cv_id': cv_id
-            }
-        )
+    def delete(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
 
-        # 404 validation
-        if 'ConsumedCapacity' in db_response:
-            raise HTTPException(
-                status_code=404,
-                detail='CV not found.'
-            )
+        # DB logic
+        delete_cv_from_db(cv_id=cv_id)
+        company_id: str = get_company_id(id_from_token=id_from_token)
+        delete_cv_from_company_model(company_id=company_id, cv_id=cv_id)
 
         # Response
         response = JSONResponse(
-                content="CV successfully deleted!",
-                status_code=status.HTTP_200_OK
-            )
+            content="CV successfully deleted!",
+            status_code=status.HTTP_200_OK
+        )
         return response
 
     @staticmethod
@@ -172,11 +177,11 @@ class CVRepository:
 
         # Filtering
         result = [
-                item for item in scan_result
-                if (skill in item.skills.lower())
-                and (last_name in item.last_name.lower())
-                and (major in item.major.lower())
-                ]
+            item for item in scan_result
+            if (skill in item.skills.lower())
+               and (last_name in item.last_name.lower())
+               and (major in item.major.lower())
+        ]
 
         # Empty result list validation
         check_for_404(result, message="No matches found!")

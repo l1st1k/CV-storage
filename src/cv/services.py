@@ -5,9 +5,14 @@ import os
 from glob import glob
 from typing import Type, Union
 
-from core.database import cv_table
+from boto3.dynamodb.conditions import Attr
+from fastapi import HTTPException
 
-from cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate
+from company.models import CompanyInsertAndFullRead
+from company.services import get_company_by_id
+from core.database import cv_table, company_table
+
+from cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate, CVsFullRead
 
 __all__ = (
     'model_to_csv',
@@ -16,6 +21,10 @@ __all__ = (
     'b64_to_file',
     'update_item_attrs',
     'update_encoded_string',
+    'add_cv_to_company_model',
+    'delete_cv_from_company_model',
+    'delete_cv_from_db',
+    'select_companys_cvs',
 )
 
 
@@ -105,3 +114,67 @@ def update_encoded_string(cv_id: str, encoded_string: bytes):
         ExpressionAttributeValues={':cv_in_bytes': encoded_string}
     )
     return response
+
+
+def add_cv_to_company_model(company: CompanyInsertAndFullRead, cv: CVInsertIntoDB) -> None:
+    # Querying the existing cvs
+    existing_cvs = company.cvs if company.cvs else set()
+    existing_cvs.add(cv.cv_id)  # Adding new cv_id
+
+    # Update the cvs attribute in DynamoDB
+    company_table.update_item(
+        Key={'company_id': company.company_id},
+        UpdateExpression="SET cvs = :cvs",
+        ExpressionAttributeValues={
+            ":cvs": existing_cvs
+        }
+    )
+
+
+def delete_cv_from_company_model(company_id: str, cv_id: str) -> None:
+    # Retrieve the company by ID
+    company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
+
+    # Check if the company exists and has a cvs attribute
+    if company and company.cvs:
+        # Remove the cv_id from the set of cvs
+        if cv_id in company.cvs:
+            company.cvs.remove(cv_id)
+            # If set is empty - we set None
+            company.cvs = None if not company.cvs else company.cvs
+
+            # Update the cvs attribute in DynamoDB
+            company_table.update_item(
+                Key={'company_id': company.company_id},
+                UpdateExpression="SET cvs = :cvs",
+                ExpressionAttributeValues={
+                    ":cvs": company.cvs
+                }
+            )
+
+
+def delete_cv_from_db(cv_id: str) -> None:
+    db_response = cv_table.delete_item(
+            Key={
+                'cv_id': cv_id
+            }
+        )
+
+    # 404 validation
+    if 'ConsumedCapacity' in db_response:
+        raise HTTPException(
+            status_code=404,
+            detail='CV not found.'
+        )
+
+
+def select_companys_cvs(company_id: str) -> CVsFullRead:
+    response = cv_table.scan(
+        FilterExpression=Attr('company_id').eq(company_id)
+    )
+    items = response['Items']
+    if items:
+        return [CVFullRead(**document) for document in items]
+    else:
+        company = get_company_by_id(company_id=company_id)
+        raise HTTPException(status_code=404, detail=f'There are no any cvs in {company.company_name}.')

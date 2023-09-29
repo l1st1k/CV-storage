@@ -1,5 +1,6 @@
-from fastapi import Query, UploadFile
+from fastapi import Query, UploadFile, Depends
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi_jwt_auth import AuthJWT
 
 from cv.models import *
 from cv.repository import CVRepository
@@ -21,32 +22,32 @@ class CVRouter:
         self.app.get("/cvs/search", response_model=CVsFullRead, tags=self.tags)(self.search_cvs)
 
     @staticmethod
-    async def list_cvs():
-        return CVRepository.list()
+    async def list_cvs(Authorize: AuthJWT = Depends()) -> CVsFullRead:
+        return CVRepository.list(Authorize=Authorize)
 
     @staticmethod
-    async def get_cv(cv_id: str):
+    async def get_cv(cv_id: str) -> CVFullRead:
         return CVRepository.get(cv_id=cv_id)
 
     @staticmethod
-    async def post_cv(file: UploadFile):
-        return CVRepository.create(file=file)
+    async def post_cv(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return CVRepository.create(file=file, Authorize=Authorize)
 
     @staticmethod
-    async def update_cv(cv_id: str, model: CVUpdate):
+    async def update_cv(cv_id: str, model: CVUpdate) -> CVFullRead:
         return CVRepository.update(cv_id=cv_id, data=model)
 
     @staticmethod
-    async def get_csv(cv_id: str):
+    async def get_csv(cv_id: str) -> FileResponse:
         return CVRepository.get_csv(cv_id=cv_id)
 
     @staticmethod
-    async def delete_cv(cv_id: str):
-        return CVRepository.delete(cv_id=cv_id)
+    async def delete_cv(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return CVRepository.delete(cv_id=cv_id, Authorize=Authorize)
 
     @staticmethod
     async def search_cvs(skill: str = Query(default=''), last_name: str = Query(default='', max_length=25),
-                         major: str = Query(default='', max_length=25)):
+                         major: str = Query(default='', max_length=25)) -> CVsFullRead:
         skill = skill.lower()
         last_name = last_name.lower()
         major = major.lower()
