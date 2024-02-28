@@ -140,3 +140,5 @@ dmypy.json
 terraform.tfstate
 terraform.tfstate.backup
 /src/curl.txt
+
+http

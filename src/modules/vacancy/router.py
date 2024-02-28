@@ -2,8 +2,8 @@ from fastapi import Depends
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from vacancy.models import *
-from vacancy.repository import VacancyRepository
+from modules.vacancy.models import *
+from modules.vacancy.repository import VacancyRepository
 
 
 class VacancyRouter:

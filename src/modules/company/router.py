@@ -2,9 +2,9 @@ from fastapi import Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from core.services_auth import AuthModel
+from modules.company.models import CompaniesRead, CompanyInsertAndFullRead, CompanyUpdate
 
-from company.models import *
-from company.repository import CompanyRepository
+from modules.company.repository import CompanyRepository
 
 
 class CompanyRouter:

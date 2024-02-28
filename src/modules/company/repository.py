@@ -1,17 +1,16 @@
 import logging
 
-from botocore.exceptions import ClientError
 from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from company.models import (CompaniesRead, CompanyInsertAndFullRead,
-                            CompanyShortRead, CompanyUpdate)
-from company.services import (check_photo_type, create_company_model,
-                              get_company_by_email, update_company_model, get_company_by_id)
-from core.database import company_table
+from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
+                                    CompanyShortRead, CompanyUpdate)
+from modules.company.services import (check_photo_type, create_company_model,
+                                      get_company_by_email, update_company_model, get_company_by_id)
+# from core.database import company_table
 from core.services_auth import AuthModel, verify_password
-from core.services_general import check_for_404, check_for_404_with_item
+from core.services_general import check_for_404
 
 __all__ = (
     'CompanyRepository',
@@ -90,8 +89,9 @@ class CompanyRepository:
             raise HTTPException(status_code=401, detail="Bad username or password")
 
         # Generating tokens
-        access_token = Authorize.create_access_token(subject=company.company_id)
-        refresh_token = Authorize.create_refresh_token(subject=company.company_id)
+        # TODO set exp_time
+        access_token = Authorize.create_access_token(subject=company.company_id, expires_time=False)
+        refresh_token = Authorize.create_refresh_token(subject=company.company_id, expires_time=False)
         return {"access_token": access_token, "refresh_token": refresh_token}
 
     @staticmethod

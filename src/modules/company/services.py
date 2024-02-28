@@ -1,13 +1,12 @@
 import logging
 from base64 import b64encode
 
-from boto3.dynamodb.conditions import Attr
 from fastapi import UploadFile, HTTPException
 
-from core.database import company_table
+# from core.database import company_table
 from core.services_auth import AuthModel, hash_password
 from core.services_general import get_uuid, check_for_404_with_item
-from company.models import CompanyInsertAndFullRead, CompanyUpdate
+from modules.company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (
     'check_photo_type',

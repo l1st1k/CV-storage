@@ -4,13 +4,12 @@ from fastapi import Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from company.models import CompanyInsertAndFullRead
-from company.services import get_company_by_id
-from core.database import manager_table
+from modules.company.models import CompanyInsertAndFullRead
+from modules.company.services import get_company_by_id
+# from core.database import manager_table
 from core.services_auth import AuthModel, verify_password
-from manager.models import *
-from manager.permissions import manager_itself_or_related_company
-from manager.services import *
+from modules.manager.models import *
+from modules.manager.permissions import manager_itself_or_related_company
 
 
 class ManagerRepository:

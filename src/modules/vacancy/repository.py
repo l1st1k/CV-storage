@@ -2,12 +2,12 @@ from fastapi import Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from company.models import CompanyInsertAndFullRead
-from company.services import get_company_by_id
-from core.database import vacancy_table
+from modules.company.models import CompanyInsertAndFullRead
+from modules.company.services import get_company_by_id
+# from core.database import vacancy_table
 from core.services_general import get_uuid
-from vacancy.models import *
-from vacancy.services import *
+from modules.vacancy.models import *
+from modules.vacancy.services import *
 
 
 class VacancyRepository:

@@ -1,12 +1,12 @@
-from boto3.dynamodb.conditions import Attr
+# from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
-from company.models import CompanyInsertAndFullRead
-from company.services import get_company_by_id
-from core.database import manager_table, company_table
+from modules.company.models import CompanyInsertAndFullRead
+from modules.company.services import get_company_by_id
+# from core.database import manager_table, company_table
 from core.services_auth import hash_password, AuthModel
 from core.services_general import get_uuid, check_for_404_with_item
-from manager.models import *
+from modules.manager.models import *
 
 __all__ = (
     'select_companys_managers',

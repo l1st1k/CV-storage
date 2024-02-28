@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 
-from core.database import manager_table
-from manager.models import ManagerInsertAndFullRead
+from modules.manager.models import ManagerInsertAndFullRead
 
 __all__ = (
     'manager_itself_or_related_company',

@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from core.services_auth import AuthModel
-from manager.models import *
-from manager.repository import ManagerRepository
+from modules.manager.models import *
+from modules.manager.repository import ManagerRepository
 
 
 class ManagerRouter:

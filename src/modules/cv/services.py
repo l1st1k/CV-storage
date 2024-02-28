@@ -5,14 +5,13 @@ import os
 from glob import glob
 from typing import Type, Union
 
-from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
-from company.models import CompanyInsertAndFullRead
-from company.services import get_company_by_id
-from core.database import cv_table, company_table
+from modules.company.models import CompanyInsertAndFullRead
+from modules.company.services import get_company_by_id
+# from core.database import cv_table, company_table
 
-from cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate, CVsFullRead
+from modules.cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate, CVsFullRead
 
 __all__ = (
     'model_to_csv',

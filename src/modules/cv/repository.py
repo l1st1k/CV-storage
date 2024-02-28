@@ -3,16 +3,17 @@ from base64 import b64encode
 
 from fastapi_jwt_auth import AuthJWT
 
-from company.models import CompanyInsertAndFullRead
-from company.services import get_company_by_id
-from core.database import cv_table
+from modules.company.models import *
+from modules.company.services import get_company_by_id
+# from core.database import cv_table
 from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
 from core.services_general import check_for_404, check_for_404_with_item, get_uuid
+from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
+from modules.cv.services import b64_to_file, select_companys_cvs, csv_to_model, clear_csv, add_cv_to_company_model, \
+    update_item_attrs, model_to_csv, update_encoded_string, delete_cv_from_db, delete_cv_from_company_model
 
-from cv.models import *
-from cv.services import *
-from vacancy.services import get_company_id
+from modules.vacancy.services import get_company_id
 
 __all__ = (
     'CVRepository',
