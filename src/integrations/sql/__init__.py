@@ -3,10 +3,14 @@ import logging
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-# from src.bp_urls.models import RequestsTable  # Don't delete this import
+from sqlalchemy.orm.session import Session
 
 from core.config import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+from integrations.sql.sqlalchemy_base import Base
+
+# Don't delete imports (required for table creation process)
+from modules.cv.table import CvTable
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +21,7 @@ class SQL_Client:
 
     @classmethod
     def get_url(cls):
-        cls.sql_url = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@postgresql/{POSTGRES_DB}"
+        cls.sql_url = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@localhost/{POSTGRES_DB}"
 
     def __new__(cls):
         if cls._instance is None:
@@ -30,9 +34,10 @@ class SQL_Client:
                 pool_pre_ping=True,
                 # echo=True
             )
+
         return cls._instance
 
-    def create_session(self):
+    def create_session(self) -> Session:
         session = sessionmaker(bind=self.engine)()
 
         return session
@@ -45,4 +50,5 @@ def initialize(app: FastAPI):
     global sql_client
     logger.info("Initializing SQL connection...")
     sql_client = SQL_Client()
+    Base.metadata.create_all(sql_client.engine)
     logger.info("SQL initialized!")
