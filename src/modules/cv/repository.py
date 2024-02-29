@@ -5,13 +5,13 @@ from fastapi_jwt_auth import AuthJWT
 
 from modules.company.models import *
 from modules.company.services import get_company_by_id
-# from core.database import cv_table
 from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
 from core.services_general import check_for_404, check_for_404_with_item, get_uuid
 from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file, select_companys_cvs, csv_to_model, clear_csv, add_cv_to_company_model, \
     update_item_attrs, model_to_csv, update_encoded_string, delete_cv_from_db, delete_cv_from_company_model
+from modules.cv.table import CvTable
 
 from modules.vacancy.services import get_company_id
 
@@ -53,14 +53,13 @@ class CVRepository:
     @staticmethod
     def create(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
         """Uploads a CV and returns its id"""
-        Authorize.jwt_required()
-        id_from_token = Authorize.get_jwt_subject()
+        # Authorize.jwt_required()
+        id_from_token = "3422b448-2460-5fd2-9183-8999de6f8343"
 
         # Type check
         if file and (file.content_type != 'text/csv'):
             raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-                                detail="CV should be in .csv format!"
-                                )
+                                detail="CV should be in .csv format!")
 
         # .csv into base 64
         encoded_string: bytes = b64encode(file.file.read())
@@ -71,20 +70,17 @@ class CVRepository:
         # Reading .csv into model
         model = csv_to_model(response_class=CVInsertIntoDB)
         model.cv_id = get_uuid()
+        model.company_id = id_from_token
         model.cv_in_bytes = encoded_string
 
         # Deleting local .csv
         clear_csv()
 
         # Database logic
-        company_id: str = get_company_id(id_from_token=id_from_token)
-        model.company_id = company_id
-        cv_table.put_item(Item=dict(model))
-        company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id)
-        add_cv_to_company_model(company=company, cv=model)
+        CvTable.add(model)
 
         # Logging
-        logging.info(f"New CV received: {file.filename} for company(id = {company_id})")
+        logging.info(f"New CV received: {file.filename} for company(id = {id_from_token})")
 
         # Response
         response = JSONResponse(

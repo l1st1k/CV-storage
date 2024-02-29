@@ -9,7 +9,8 @@ from core.config import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
 from integrations.sql.sqlalchemy_base import Base
 
 # Don't delete imports (required for table creation process)
-from modules.cv.table import CvTable
+# from modules.cv.table import CvTable
+from modules.company.table import CompanyTable
 
 
 logger = logging.getLogger(__name__)
@@ -43,12 +44,9 @@ class SQL_Client:
         return session
 
 
-sql_client = None
-
-
-def initialize(app: FastAPI):
-    global sql_client
+def initialize(app: FastAPI, ctx: dict):
     logger.info("Initializing SQL connection...")
     sql_client = SQL_Client()
     Base.metadata.create_all(sql_client.engine)
+    ctx["sql_client"] = sql_client
     logger.info("SQL initialized!")

@@ -1,21 +1,25 @@
+import uuid
 from typing import Optional
 
-from sqlalchemy import Column, Integer, String, text
+from sqlalchemy import Column, Integer, String, text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship, Session
 
-# from integrations.sql import sql_client
+
 from integrations.sql.sqlalchemy_base import Base
-from modules.cv.models import CVsFullRead
-
-
-global sql_client
+from modules.cv.models import CVsFullRead, CVInsertIntoDB
 
 
 class CvTable(Base):
     __tablename__ = "cv"
 
+    @classmethod
+    def get_session(cls):
+        from main import get_ctx
+        return get_ctx().get("sql_client").create_session()
+
     cv_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
-    company_id = Column(UUID(as_uuid=True), nullable=False)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('company.company_id'), nullable=False)
     first_name = Column(String(length=255), nullable=False)
     last_name = Column(String(length=255), nullable=False)
     age = Column(Integer, nullable=False)
@@ -27,20 +31,39 @@ class CvTable(Base):
     project_amount = Column(Integer, nullable=False)
     cv_in_bytes = Column(String, nullable=True)
 
+    # Relationship
+    company = relationship("CompanyTable", back_populates="cvs")
+
     @classmethod
-    def get_request(cls, url: str):
-        """Retrieves request data by URL"""
-        session = sql_client.create_session()
-        session.close()
-    #
-    #     try:
-    #         sql_expression = text(
-    #             f"SELECT * FROM {cls.__tablename__} WHERE :url REGEXP {cls.__tablename__}.url_regex LIMIT 1"
-    #         )
-    #         request = session.execute(sql_expression, {"url": url}).fetchone()
-    #         return RequestData.from_row(request) if request else None
-    #     except:
-    #         session.rollback()
-    #         raise
-    #     finally:
-    #         session.close()
+    def from_model(cls, model: CVInsertIntoDB):
+        return cls(
+            cv_id=uuid.UUID(model.cv_id),
+            company_id=uuid.UUID(model.company_id),
+            first_name=model.first_name,
+            last_name=model.last_name,
+            age=model.age,
+            phone_number=model.phone_number,
+            major=model.major,
+            years_of_exp=model.years_of_exp,
+            skills=model.skills,
+            projects=model.projects,
+            project_amount=model.project_amount,
+            cv_in_bytes=model.cv_in_bytes if model.cv_in_bytes else None
+        )
+
+    @classmethod
+    def add(cls, model: CVInsertIntoDB) -> Optional[str]:
+        """Inserting CV model to DB"""
+        session = cls.get_session()
+
+        try:
+            obj = cls.from_model(model)
+            session.add(obj)
+            session.commit()
+
+            return model.cv_id
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()

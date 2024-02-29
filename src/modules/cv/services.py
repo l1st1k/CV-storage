@@ -9,7 +9,6 @@ from fastapi import HTTPException
 
 from modules.company.models import CompanyInsertAndFullRead
 from modules.company.services import get_company_by_id
-# from core.database import cv_table, company_table
 
 from modules.cv.models import CVFullRead, CVInsertIntoDB, CVShortRead, CVUpdate, CVsFullRead
 
