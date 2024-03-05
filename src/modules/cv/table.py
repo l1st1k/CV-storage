@@ -1,13 +1,13 @@
 import uuid
-from typing import Optional, List, Type
+from typing import Optional, Type
 
-from sqlalchemy import Column, Integer, String, text, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin
 from integrations.sql.sqlalchemy_base import Base
-from modules.cv.models import CVsFullRead, CVInsertIntoDB, CVFullRead
+from modules.cv.models import CVInsertIntoDB, CVFullRead
 
 
 class CvTable(Base, TableMixin):
@@ -57,7 +57,7 @@ class CvTable(Base, TableMixin):
     @classmethod
     def retrieve(cls, cv_id: str) -> CVFullRead:
         with cls.session_manager() as session:
-            row: List[Type[CvTable]] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
+            row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
             check_for_404(row, "No CV with such ID")
 
             return CVFullRead(**cls.to_dict(row))

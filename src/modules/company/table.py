@@ -1,7 +1,7 @@
 import uuid
-from typing import Optional, Type, List
+from typing import Type
 
-from sqlalchemy import Column, Integer, String, text, ForeignKey, LargeBinary
+from sqlalchemy import Column, String, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -9,8 +9,6 @@ from core.services_general import TableMixin, check_for_404
 from integrations.sql.sqlalchemy_base import Base
 from modules.company.models import CompanyInsertAndFullRead
 from modules.cv.models import CVsFullRead, CVFullRead
-
-global sql_client
 
 
 class CompanyTable(Base, TableMixin):
