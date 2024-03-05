@@ -1,9 +1,16 @@
 # CV-storage (Backend)
-Project for storing and sharing IT cvs. <br /> 
-Stack: Python, FastAPI, DynamoDB, Terraform, LocalStack, boto3.
+Backend project  -  **"Internal HRM system"** <br /> 
+Stack: Python, FastAPI, SQLAlchemy, PostgreSQL, JWT.
 
-### Commands to start the project:
-`make setup` _- for the first run only! Includes database initialization_<br />
-`make start` _- for application startup_<br /> 
+## Makefile commands:
+`make db` - for database startup<br /> 
+`make web` - for web-application startup<br /> 
+`make up` - for both<br /> 
+`make stop-db` - for database stop<br /> 
+`make stop-web` - for web-application stop<br /> 
+`make stop` - for both<br /> 
 
-### [Swagger endpoint](http://127.0.0.1:8000/docs) 
+## Links:
+#### [Swagger endpoint](http://127.0.0.1:8000/docs) 
+#### [Frontend Repo](https://github.com/l1st1k/InIS-CourseWork) 
+#### [.env](https://github.com/l1st1k/CV-storage/blob/master/src/.env-example) 

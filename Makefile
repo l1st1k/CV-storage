@@ -1,8 +1,8 @@
-.PHONY:  start db web stop stop-db stop-web
+.PHONY:  up db web stop stop-db stop-web
 
-start:
+up:
 	$(MAKE) db
-	$(MAKE) start-fastapi
+	$(MAKE) web
 
 db:
 	cd devops && docker-compose up -d
