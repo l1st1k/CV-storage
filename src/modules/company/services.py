@@ -3,9 +3,8 @@ from base64 import b64encode
 
 from fastapi import UploadFile, HTTPException
 
-# from core.database import company_table
 from core.services_auth import AuthModel, hash_password
-from core.services_general import get_uuid, check_for_404_with_item
+from core.services_general import get_uuid
 from modules.company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (

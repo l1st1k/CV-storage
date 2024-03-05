@@ -7,7 +7,7 @@ from modules.company.models import *
 from modules.company.services import get_company_by_id
 from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
-from core.services_general import check_for_404, check_for_404_with_item, get_uuid
+from core.services_general import check_for_404, get_uuid
 from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file, select_companys_cvs, csv_to_model, clear_csv, add_cv_to_company_model, \
     update_item_attrs, model_to_csv, update_encoded_string, delete_cv_from_db, delete_cv_from_company_model
@@ -34,21 +34,9 @@ class CVRepository:
 
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
-        response = cv_table.get_item(
-            Key={
-                'cv_id': cv_id
-            }
-        )
-
-        # 404 validation
-        check_for_404_with_item(
-            container=response,
-            item='Item',
-            message='CV not found.'
-        )
-
-        document = response['Item']
-        return CVFullRead(**document)
+        # Authorize.jwt_required()
+        item = CvTable.get(cv_id=cv_id)
+        return item
 
     @staticmethod
     def create(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
@@ -77,7 +65,7 @@ class CVRepository:
         clear_csv()
 
         # Database logic
-        CvTable.add(model)
+        CvTable.create(model)
 
         # Logging
         logging.info(f"New CV received: {file.filename} for company(id = {id_from_token})")

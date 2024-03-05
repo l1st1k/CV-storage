@@ -1,10 +1,7 @@
-# from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
 from modules.company.models import CompanyInsertAndFullRead
 from modules.company.services import get_company_by_id
-# from core.database import vacancy_table, manager_table, company_table
-from core.services_general import check_for_404_with_item
 from modules.vacancy.models import *
 
 __all__ = (

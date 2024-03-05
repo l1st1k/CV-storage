@@ -1,22 +1,17 @@
 import uuid
-from typing import Optional
+from typing import Optional, List, Type
 
 from sqlalchemy import Column, Integer, String, text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, Session
 
-
+from core.services_general import check_for_404, TableMixin
 from integrations.sql.sqlalchemy_base import Base
-from modules.cv.models import CVsFullRead, CVInsertIntoDB
+from modules.cv.models import CVsFullRead, CVInsertIntoDB, CVFullRead
 
 
-class CvTable(Base):
+class CvTable(Base, TableMixin):
     __tablename__ = "cv"
-
-    @classmethod
-    def get_session(cls):
-        from main import get_ctx
-        return get_ctx().get("sql_client").create_session()
 
     cv_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     company_id = Column(UUID(as_uuid=True), ForeignKey('company.company_id'), nullable=False)
@@ -52,9 +47,9 @@ class CvTable(Base):
         )
 
     @classmethod
-    def add(cls, model: CVInsertIntoDB) -> Optional[str]:
+    def create(cls, model: CVInsertIntoDB) -> Optional[str]:
         """Inserting CV model to DB"""
-        session = cls.get_session()
+        session: Session = cls.get_session()
 
         try:
             obj = cls.from_model(model)
@@ -62,6 +57,21 @@ class CvTable(Base):
             session.commit()
 
             return model.cv_id
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    @classmethod
+    def get(cls, cv_id: str) -> CVFullRead:
+        session: Session = cls.get_session()
+        try:
+            rows: List[Type[CvTable]] = list(
+                session.query(cls).filter_by(cv_id=uuid.UUID(cv_id))
+            )
+            check_for_404(rows)
+            return CVFullRead(**cls.to_dict(rows[0]))
         except Exception:
             session.rollback()
             raise
