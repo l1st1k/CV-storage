@@ -48,32 +48,18 @@ class CvTable(Base, TableMixin):
 
     @classmethod
     def create(cls, model: CVInsertIntoDB) -> Optional[str]:
-        """Inserting CV model to DB"""
-        session: Session = cls.get_session()
-
-        try:
+        with cls.session_manager() as session:
             obj = cls.from_model(model)
             session.add(obj)
-            session.commit()
 
             return model.cv_id
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
 
     @classmethod
-    def get(cls, cv_id: str) -> CVFullRead:
-        session: Session = cls.get_session()
-        try:
+    def retrieve(cls, cv_id: str) -> CVFullRead:
+        with cls.session_manager() as session:
             rows: List[Type[CvTable]] = list(
                 session.query(cls).filter_by(cv_id=uuid.UUID(cv_id))
             )
             check_for_404(rows)
+
             return CVFullRead(**cls.to_dict(rows[0]))
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()

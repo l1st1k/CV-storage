@@ -35,7 +35,7 @@ class CVRepository:
     @staticmethod
     def get(cv_id: str) -> CVFullRead:
         # Authorize.jwt_required()
-        item = CvTable.get(cv_id=cv_id)
+        item = CvTable.retrieve(cv_id=cv_id)
         return item
 
     @staticmethod

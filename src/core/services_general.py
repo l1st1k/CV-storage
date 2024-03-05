@@ -1,8 +1,10 @@
 import logging
 import uuid
+from contextlib import contextmanager
 from uuid import uuid4
 
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
 __all__ = (
     'get_uuid',
@@ -12,7 +14,7 @@ __all__ = (
 
 
 #  Settings
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def get_uuid() -> str:
@@ -34,9 +36,22 @@ class TableMixin:
         super().__init__(**kwargs)
 
     @classmethod
-    def get_session(cls):
+    def get_session(cls) -> Session:
         from main import get_ctx
         return get_ctx().get("sql_client").create_session()
+
+    @classmethod
+    @contextmanager
+    def session_manager(cls):
+        session: Session = cls.get_session()
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     @classmethod
     def to_dict(cls, obj):
