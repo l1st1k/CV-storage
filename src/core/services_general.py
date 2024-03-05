@@ -22,13 +22,16 @@ def get_uuid() -> str:
     return str(uuid4())
 
 
-def check_for_404(container, message: str = "Item can't be found!") -> None:
-    """Checks container for 'empty' case"""
-    if not len(container):
-        raise HTTPException(
-            status_code=404,
-            detail=message
-        )
+def check_for_404(item, message: str = "Item can't be found!") -> None:
+    """Checks object/container for 'empty' case"""
+    exc = HTTPException(status_code=404, detail=message)
+    if hasattr(item, "len"):
+        # Container case
+        if not len(item):
+            raise exc
+    elif not item:
+        # Object case
+        raise exc
 
 
 class TableMixin:

@@ -10,7 +10,7 @@ from integrations.sql.sqlalchemy_base import Base
 
 # Don't delete imports (required for table creation process)
 # from modules.cv.table import CvTable
-from modules.company.table import CompanyTable
+# from modules.company.table import CompanyTable
 
 
 logger = logging.getLogger(__name__)

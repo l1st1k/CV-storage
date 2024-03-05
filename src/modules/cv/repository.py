@@ -8,6 +8,7 @@ from modules.company.services import get_company_by_id
 from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
 from core.services_general import check_for_404, get_uuid
+from modules.company.table import CompanyTable
 from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file, select_companys_cvs, csv_to_model, clear_csv, add_cv_to_company_model, \
     update_item_attrs, model_to_csv, update_encoded_string, delete_cv_from_db, delete_cv_from_company_model
@@ -23,12 +24,12 @@ __all__ = (
 class CVRepository:
     @staticmethod
     def list(Authorize: AuthJWT = Depends()) -> CVsFullRead:
-        Authorize.jwt_required()
-        id_from_token = Authorize.get_jwt_subject()
-        company_id: str = get_company_id(id_from_token=id_from_token)
+        # Authorize.jwt_required()
+        # id_from_token = Authorize.get_jwt_subject()
+        # company_id: str = get_company_id(id_from_token=id_from_token)
+        company_id = "3422b448-2460-5fd2-9183-8999de6f8344"
 
-        # Scanning DB
-        list_of_cvs: CVsFullRead = select_companys_cvs(company_id=company_id)
+        list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
 
         return list_of_cvs
 

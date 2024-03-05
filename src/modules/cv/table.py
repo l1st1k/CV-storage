@@ -3,7 +3,7 @@ from typing import Optional, List, Type
 
 from sqlalchemy import Column, Integer, String, text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin
 from integrations.sql.sqlalchemy_base import Base
@@ -57,9 +57,7 @@ class CvTable(Base, TableMixin):
     @classmethod
     def retrieve(cls, cv_id: str) -> CVFullRead:
         with cls.session_manager() as session:
-            rows: List[Type[CvTable]] = list(
-                session.query(cls).filter_by(cv_id=uuid.UUID(cv_id))
-            )
-            check_for_404(rows)
+            row: List[Type[CvTable]] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
+            check_for_404(row, "No CV with such ID")
 
-            return CVFullRead(**cls.to_dict(rows[0]))
+            return CVFullRead(**cls.to_dict(row))
