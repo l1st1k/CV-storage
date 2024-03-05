@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from core.services_general import check_for_404, TableMixin
+from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
 from modules.cv.models import CVInsertIntoDB, CVFullRead
 
@@ -61,3 +61,13 @@ class CvTable(Base, TableMixin):
             check_for_404(row, "No CV with such ID")
 
             return CVFullRead(**cls.to_dict(row))
+
+    @classmethod
+    def delete(cls, cv_id: str, company_id) -> None:
+        with cls.session_manager() as session:
+            cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
+            check_for_404(cv_row, "No CV with such ID")
+            if str(cv_row.company_id) == company_id:
+                session.delete(cv_row)
+            else:
+                raise NO_PERMISSION_EXCEPTION

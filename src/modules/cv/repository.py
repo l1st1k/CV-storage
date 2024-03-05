@@ -27,7 +27,7 @@ class CVRepository:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
         # company_id: str = get_company_id(id_from_token=id_from_token)
-        company_id = "3422b448-2460-5fd2-9183-8999de6f8344"
+        company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
 
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
 
@@ -84,65 +84,66 @@ class CVRepository:
 
     @classmethod
     def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
-        # Updating model's fields
-        update_item_attrs(cv_id, data)
-
-        # Taking updated attrs in model
-        model: CVFullRead = cls.get(cv_id)
-
-        # Writing local .csv with updated attrs
-        model_to_csv(model)
-
-        # Reading .csv into base64
-        filename = model.last_name + '.csv'
-        with open(filename, "rb") as file:
-            encoded_string = b64encode(file.read())
-        update_encoded_string(cv_id=cv_id, encoded_string=encoded_string)
-
-        # Deleting local .csv
-        clear_csv()
-
-        # Responding with the full model of updated items
-        return model
+        pass
+        # # Updating model's fields
+        # update_item_attrs(cv_id, data)
+        #
+        # # Taking updated attrs in model
+        # model: CVFullRead = cls.get(cv_id)
+        #
+        # # Writing local .csv with updated attrs
+        # model_to_csv(model)
+        #
+        # # Reading .csv into base64
+        # filename = model.last_name + '.csv'
+        # with open(filename, "rb") as file:
+        #     encoded_string = b64encode(file.read())
+        # update_encoded_string(cv_id=cv_id, encoded_string=encoded_string)
+        #
+        # # Deleting local .csv
+        # clear_csv()
+        #
+        # # Responding with the full model of updated items
+        # return model
 
     @staticmethod
     def get_csv(cv_id: str) -> FileResponse:
-        # Querying from DB
-        document = cv_table.get_item(
-            Key={
-                'cv_id': cv_id
-            },
-            AttributesToGet=[
-                'last_name', 'cv_in_bytes'
-            ]
-        )
-
-        # 404 validation
-        check_for_404_with_item(
-            container=document,
-            item='Item',
-            message='CV not found.'
-        )
-
-        # Taking data from response
-        title: str = document['Item']['last_name'] + '.csv'
-        cv_in_bytes: bytes = document['Item']['cv_in_bytes']
-
-        # Writing local .csv
-        b64_to_file(bytes(cv_in_bytes), title=title)
-
-        # Response (as a '.csv' file)
-        return FileResponse(title)
+        pass
+        # # Querying from DB
+        # document = cv_table.get_item(
+        #     Key={
+        #         'cv_id': cv_id
+        #     },
+        #     AttributesToGet=[
+        #         'last_name', 'cv_in_bytes'
+        #     ]
+        # )
+        #
+        # # 404 validation
+        # check_for_404_with_item(
+        #     container=document,
+        #     item='Item',
+        #     message='CV not found.'
+        # )
+        #
+        # # Taking data from response
+        # title: str = document['Item']['last_name'] + '.csv'
+        # cv_in_bytes: bytes = document['Item']['cv_in_bytes']
+        #
+        # # Writing local .csv
+        # b64_to_file(bytes(cv_in_bytes), title=title)
+        #
+        # # Response (as a '.csv' file)
+        # return FileResponse(title)
 
     @staticmethod
     def delete(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        Authorize.jwt_required()
-        id_from_token = Authorize.get_jwt_subject()
+        # Authorize.jwt_required()
+        # id_from_token = Authorize.get_jwt_subject()
+        # company_id: str = get_company_id(id_from_token=id_from_token)
+        company_id: str = "3422b448-2460-5fd2-9183-8999de6f8343"
 
-        # DB logic
-        delete_cv_from_db(cv_id=cv_id)
-        company_id: str = get_company_id(id_from_token=id_from_token)
-        delete_cv_from_company_model(company_id=company_id, cv_id=cv_id)
+        CvTable.delete(cv_id=cv_id, company_id=company_id)
 
         # Response
         response = JSONResponse(
@@ -153,23 +154,24 @@ class CVRepository:
 
     @staticmethod
     def search(skill: str, last_name: str, major: str) -> CVsFullRead:
-        response_from_db = cv_table.scan()
-
-        # Empty DB validation
-        check_for_404(response_from_db['Items'], message="There is no any CV's in database!")
-
-        # Taking list of items from db_response
-        scan_result = [CVFullRead(**document) for document in response_from_db['Items']]
-
-        # Filtering
-        result = [
-            item for item in scan_result
-            if (skill in item.skills.lower())
-               and (last_name in item.last_name.lower())
-               and (major in item.major.lower())
-        ]
-
-        # Empty result list validation
-        check_for_404(result, message="No matches found!")
-
-        return result
+        pass
+        # response_from_db = cv_table.scan()
+        #
+        # # Empty DB validation
+        # check_for_404(response_from_db['Items'], message="There is no any CV's in database!")
+        #
+        # # Taking list of items from db_response
+        # scan_result = [CVFullRead(**document) for document in response_from_db['Items']]
+        #
+        # # Filtering
+        # result = [
+        #     item for item in scan_result
+        #     if (skill in item.skills.lower())
+        #        and (last_name in item.last_name.lower())
+        #        and (major in item.major.lower())
+        # ]
+        #
+        # # Empty result list validation
+        # check_for_404(result, message="No matches found!")
+        #
+        # return result

@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 __all__ = (
+    'NO_PERMISSION_EXCEPTION',
     'get_uuid',
     'check_for_404',
     'TableMixin',
@@ -15,6 +16,8 @@ __all__ = (
 
 #  Settings
 logging.basicConfig(level=logging.INFO)
+
+NO_PERMISSION_EXCEPTION = HTTPException(status_code=403, detail='No permissions')
 
 
 def get_uuid() -> str:
