@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
 from modules.company.table import CompanyTable
-from modules.cv.models import CVInsertIntoDB, CVFullRead
+from modules.cv.models import CVInsertIntoDB, CVFullRead, CVUpdate
 from modules.cv.services import b64_to_file
 
 
@@ -81,6 +81,24 @@ class CvTable(Base, TableMixin):
             return CVFullRead(**cls.to_dict(row))
 
     @classmethod
+    def get_updated_model(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
+        model: CVFullRead = cls.retrieve(cv_id)
+        updated_fields = data.dict(exclude_none=True)
+        updated_model = model.copy(update=updated_fields)
+
+        return updated_model
+
+    @classmethod
+    def update(cls, model: CVInsertIntoDB) -> CVFullRead:
+        with cls.session_manager() as session:
+            row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(model.cv_id)).first()
+            check_for_404(row, "No CV with such ID")
+            for field, value in model.dict(exclude={'cv_id'}).items():
+                setattr(row, field, value)
+
+            return CVFullRead(**cls.to_dict(row))
+
+    @classmethod
     def delete(cls, cv_id: str) -> None:
         with cls.session_manager() as session:
             cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
@@ -92,8 +110,7 @@ class CvTable(Base, TableMixin):
         with cls.session_manager() as session:
             cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
             check_for_404(cv_row, "No CV with such ID")
-            title: str = cv_row.last_name + ".csv"
 
-            title = b64_to_file(cv_row.cv_in_bytes, title=title)
+            title = b64_to_file(cv_row.cv_in_bytes, title=cv_row.last_name + ".csv")
 
             return title

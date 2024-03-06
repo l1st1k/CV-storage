@@ -8,7 +8,7 @@ from fastapi_jwt_auth import AuthJWT
 from core.services_general import get_uuid
 from modules.company.table import CompanyTable
 from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
-from modules.cv.services import b64_to_file, csv_to_model, clear_csv
+from modules.cv.services import b64_to_file, csv_to_model, clear_csv, model_to_csv
 from modules.cv.table import CvTable
 
 
@@ -90,27 +90,30 @@ class CVRepository:
 
     @classmethod
     def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
-        pass
-        # # Updating model's fields
-        # update_item_attrs(cv_id, data)
-        #
-        # # Taking updated attrs in model
-        # model: CVFullRead = cls.get(cv_id)
-        #
-        # # Writing local .csv with updated attrs
-        # model_to_csv(model)
-        #
-        # # Reading .csv into base64
-        # filename = model.last_name + '.csv'
-        # with open(filename, "rb") as file:
-        #     encoded_string = b64encode(file.read())
-        # update_encoded_string(cv_id=cv_id, encoded_string=encoded_string)
-        #
-        # # Deleting local .csv
-        # clear_csv()
-        #
-        # # Responding with the full model of updated items
-        # return model
+        # Authorize.jwt_required()
+        # id_from_token = Authorize.get_jwt_subject()
+        # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+
+        # Updating model's fields
+        model = CvTable.get_updated_model(cv_id, data)
+
+        # Writing local .csv with updated attrs
+        filename = model_to_csv(model)
+
+        # Reading .csv into base64
+        with open(filename, "rb") as file:
+            encoded_string = b64encode(file.read())
+        db_model = CVInsertIntoDB(**model.dict())
+        db_model.cv_in_bytes = encoded_string
+
+        # DB Update
+        CvTable.update(db_model)
+
+        # Deleting local .csv
+        clear_csv()
+
+        # Responding with the full model of updated items
+        return model
 
     @staticmethod
     def get_csv(cv_id: str) -> FileResponse:

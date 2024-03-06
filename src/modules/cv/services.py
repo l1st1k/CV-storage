@@ -30,13 +30,15 @@ __all__ = (
 logging.basicConfig(level=logging.INFO)
 
 
-def model_to_csv(model: CVFullRead) -> None:
+def model_to_csv(model: CVFullRead) -> str:
     """Writes local .csv file from model"""
     cv_dict = dict(model)
-    title = model.last_name + '.csv'
+    title = 'tmp/' + model.last_name + '.csv'
     with open(title, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(cv_dict.items())
+
+    return title
 
 
 def csv_to_model(
