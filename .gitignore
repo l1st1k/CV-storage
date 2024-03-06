@@ -142,3 +142,4 @@ terraform.tfstate.backup
 /src/curl.txt
 
 http
+tmp

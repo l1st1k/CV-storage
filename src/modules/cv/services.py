@@ -44,7 +44,7 @@ def csv_to_model(
 ) -> Union[CVFullRead, CVShortRead, CVInsertIntoDB]:
     """Turns .csv into necessary model"""
     cv_dict = dict()
-    with open('temp.csv', newline='') as csvfile:
+    with open('tmp/temp.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             cv_dict.update({row[0]: row[1]})
@@ -57,7 +57,7 @@ def csv_to_model(
 def clear_csv() -> None:
     """Deletes all local .csv"""
     # Taking filenames
-    removing_files = glob('./*.csv')
+    removing_files = glob('./tmp/*.csv')
 
     # Removing files
     for i in removing_files:
@@ -67,14 +67,17 @@ def clear_csv() -> None:
     logging.info("ALL LOCAL .csv ARE CLEARED SUCCESSFULLY!")
 
 
-def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> None:
+def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> str:
     """"Writes local .csv file from base64 string"""
     # Decoding base64
     image_64_decode = base64.b64decode(b64_str)
 
     # Creates a writable image and writes the decoded result
+    title = "tmp/" + title
     image_result = open(title, 'wb')
     image_result.write(image_64_decode)
+
+    return title
 
 
 def update_item_attrs(cv_id: str, model: CVUpdate):

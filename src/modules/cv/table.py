@@ -80,6 +80,6 @@ class CvTable(Base, TableMixin):
             check_for_404(cv_row, "No CV with such ID")
             title: str = cv_row.last_name + ".csv"
 
-            b64_to_file(cv_row.cv_in_bytes, title=title)
+            title = b64_to_file(cv_row.cv_in_bytes, title=title)
 
             return title
