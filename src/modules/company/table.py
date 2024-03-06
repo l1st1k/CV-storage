@@ -33,3 +33,8 @@ class CompanyTable(Base, TableMixin):
             check_for_404(row, "No company with such ID")
             check_for_404(row.cvs, "No CVs in a company")
             return [CVFullRead(**cls.to_dict(document)) for document in row.cvs]
+
+    @classmethod
+    def get_company_by_token_id(cls, id_from_token):
+        # TODO (Manager model required)
+        pass

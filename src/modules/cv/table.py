@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
+from modules.company.table import CompanyTable
 from modules.cv.models import CVInsertIntoDB, CVFullRead
 from modules.cv.services import b64_to_file
 
@@ -48,6 +49,22 @@ class CvTable(Base, TableMixin):
         )
 
     @classmethod
+    def check_token_permission(
+            cls,
+            id_from_token: str,
+            cv_id: str = None,
+            item_specific: bool = True
+    ) -> str:
+        company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+
+        if item_specific:
+            cv_ids = [cv.cv_id for cv in company.cvs]
+            if cv_id not in cv_ids:
+                raise NO_PERMISSION_EXCEPTION
+
+        return company.company_id
+
+    @classmethod
     def create(cls, model: CVInsertIntoDB) -> Optional[str]:
         with cls.session_manager() as session:
             obj = cls.from_model(model)
@@ -64,14 +81,11 @@ class CvTable(Base, TableMixin):
             return CVFullRead(**cls.to_dict(row))
 
     @classmethod
-    def delete(cls, cv_id: str, company_id) -> None:
+    def delete(cls, cv_id: str) -> None:
         with cls.session_manager() as session:
             cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
             check_for_404(cv_row, "No CV with such ID")
-            if str(cv_row.company_id) == company_id:
-                session.delete(cv_row)
-            else:
-                raise NO_PERMISSION_EXCEPTION
+            session.delete(cv_row)
 
     @classmethod
     def get_csv(cls, cv_id: str) -> str:
