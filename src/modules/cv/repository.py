@@ -1,20 +1,16 @@
 import logging
 from base64 import b64encode
 
-from fastapi_jwt_auth import AuthJWT
-
-from modules.company.models import *
-from modules.company.services import get_company_by_id
 from fastapi import HTTPException, UploadFile, status, Depends
 from fastapi.responses import FileResponse, JSONResponse
-from core.services_general import check_for_404, get_uuid
+from fastapi_jwt_auth import AuthJWT
+
+from core.services_general import get_uuid
 from modules.company.table import CompanyTable
 from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
-from modules.cv.services import b64_to_file, select_companys_cvs, csv_to_model, clear_csv, add_cv_to_company_model, \
-    update_item_attrs, model_to_csv, update_encoded_string, delete_cv_from_db, delete_cv_from_company_model
+from modules.cv.services import b64_to_file, csv_to_model, clear_csv
 from modules.cv.table import CvTable
 
-from modules.vacancy.services import get_company_id
 
 __all__ = (
     'CVRepository',
@@ -108,33 +104,8 @@ class CVRepository:
 
     @staticmethod
     def get_csv(cv_id: str) -> FileResponse:
-        pass
-        # # Querying from DB
-        # document = cv_table.get_item(
-        #     Key={
-        #         'cv_id': cv_id
-        #     },
-        #     AttributesToGet=[
-        #         'last_name', 'cv_in_bytes'
-        #     ]
-        # )
-        #
-        # # 404 validation
-        # check_for_404_with_item(
-        #     container=document,
-        #     item='Item',
-        #     message='CV not found.'
-        # )
-        #
-        # # Taking data from response
-        # title: str = document['Item']['last_name'] + '.csv'
-        # cv_in_bytes: bytes = document['Item']['cv_in_bytes']
-        #
-        # # Writing local .csv
-        # b64_to_file(bytes(cv_in_bytes), title=title)
-        #
-        # # Response (as a '.csv' file)
-        # return FileResponse(title)
+        title = CvTable.get_csv(cv_id=cv_id)
+        return FileResponse(title)
 
     @staticmethod
     def delete(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:

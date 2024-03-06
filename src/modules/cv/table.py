@@ -1,13 +1,14 @@
 import uuid
 from typing import Optional, Type
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
 from modules.cv.models import CVInsertIntoDB, CVFullRead
+from modules.cv.services import b64_to_file
 
 
 class CvTable(Base, TableMixin):
@@ -24,7 +25,7 @@ class CvTable(Base, TableMixin):
     skills = Column(String(length=500), nullable=False)
     projects = Column(String(length=500), nullable=True)
     project_amount = Column(Integer, nullable=False)
-    cv_in_bytes = Column(String, nullable=True)
+    cv_in_bytes = Column(LargeBinary, nullable=True)
 
     # Relationship
     company = relationship("CompanyTable", back_populates="cvs")
@@ -71,3 +72,14 @@ class CvTable(Base, TableMixin):
                 session.delete(cv_row)
             else:
                 raise NO_PERMISSION_EXCEPTION
+
+    @classmethod
+    def get_csv(cls, cv_id: str) -> str:
+        with cls.session_manager() as session:
+            cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
+            check_for_404(cv_row, "No CV with such ID")
+            title: str = cv_row.last_name + ".csv"
+
+            b64_to_file(cv_row.cv_in_bytes, title=title)
+
+            return title

@@ -19,7 +19,7 @@ class CompanyTable(Base, TableMixin):
     email = Column(String(length=255), nullable=False)
     hashed_password = Column(LargeBinary, nullable=False)
     salt = Column(LargeBinary, nullable=False)
-    logo_in_bytes = Column(String, nullable=True)
+    logo_in_bytes = Column(LargeBinary, nullable=True)
 
     # Relationships
     cvs = relationship("CvTable", back_populates="company")
