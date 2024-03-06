@@ -9,7 +9,7 @@ __all__ = ('configure_app_routes',)
 
 routers = [
     CVRouter,
-    # CompanyRouter,  # TODO enable routers
+    CompanyRouter,  # TODO enable routers
     # ManagerRouter,
     # VacancyRouter,
 ]

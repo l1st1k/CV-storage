@@ -4,13 +4,13 @@ from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
+from core.services_auth import AuthModel, verify_password
 from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead, CompanyUpdate)
 from modules.company.services import (check_photo_type, create_company_model,
                                       get_company_by_email, update_company_model, get_company_by_id)
-# from core.database import company_table
-from core.services_auth import AuthModel, verify_password
-from core.services_general import check_for_404
+from modules.company.table import CompanyTable
+
 
 __all__ = (
     'CompanyRepository',
@@ -20,13 +20,9 @@ __all__ = (
 class CompanyRepository:
     @staticmethod
     def list() -> CompaniesRead:
-        # Scanning DB
-        response = company_table.scan()
+        list_of_companies: CompaniesRead = CompanyTable.get_companies()
 
-        # Empty DB validation
-        check_for_404(response['Items'], message="There are no any Companies in database.")
-
-        return [CompanyShortRead(**document) for document in response['Items']]
+        return list_of_companies
 
     @staticmethod
     def get(company_id_from_user: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:

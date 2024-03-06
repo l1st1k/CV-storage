@@ -1,5 +1,5 @@
 import uuid
-from typing import Type
+from typing import Type, List
 
 from sqlalchemy import Column, String, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID
@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import TableMixin, check_for_404
 from integrations.sql.sqlalchemy_base import Base
-from modules.company.models import CompanyInsertAndFullRead
+from modules.company.models import CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
 from modules.cv.models import CVsFullRead, CVFullRead
 
 
@@ -25,6 +25,13 @@ class CompanyTable(Base, TableMixin):
     cvs = relationship("CvTable", back_populates="company")
     # managers = relationship("ManagerTable", back_populates="company")
     # vacancies = relationship("VacancyTable", back_populates="company")
+
+    @classmethod
+    def get_companies(cls) -> CompaniesRead:
+        with cls.session_manager() as session:
+            rows: List[Type[CompanyTable]] = session.query(cls)
+            check_for_404(rows, "There are no any companies in database")
+            return [CompanyShortRead(**cls.to_dict(document)) for document in rows]
 
     @classmethod
     def get_cvs(cls, company_id: str) -> CVsFullRead:
