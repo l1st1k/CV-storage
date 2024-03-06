@@ -26,29 +26,30 @@ class CVRouter:
         return CVRepository.list(Authorize=Authorize)
 
     @staticmethod
-    async def get_cv(cv_id: str) -> CVFullRead:
-        return CVRepository.get(cv_id=cv_id)
+    async def get_cv(cv_id: str, Authorize: AuthJWT = Depends()) -> CVFullRead:
+        return CVRepository.get(cv_id=cv_id, Authorize=Authorize)
 
     @staticmethod
     async def post_cv(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
         return CVRepository.create(file=file, Authorize=Authorize)
 
     @staticmethod
-    async def update_cv(cv_id: str, model: CVUpdate) -> CVFullRead:
-        return CVRepository.update(cv_id=cv_id, data=model)
+    async def update_cv(cv_id: str, model: CVUpdate, Authorize: AuthJWT = Depends()) -> CVFullRead:
+        return CVRepository.update(cv_id=cv_id, data=model, Authorize=Authorize)
 
     @staticmethod
-    async def get_csv(cv_id: str) -> FileResponse:
-        return CVRepository.get_csv(cv_id=cv_id)
+    async def get_csv(cv_id: str, Authorize: AuthJWT = Depends()) -> FileResponse:
+        return CVRepository.get_csv(cv_id=cv_id, Authorize=Authorize)
 
     @staticmethod
     async def delete_cv(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
         return CVRepository.delete(cv_id=cv_id, Authorize=Authorize)
 
     @staticmethod
-    async def search_cvs(skill: str = Query(default=''), last_name: str = Query(default='', max_length=25),
-                         major: str = Query(default='', max_length=25)) -> CVsFullRead:
-        skill = skill.lower()
-        last_name = last_name.lower()
-        major = major.lower()
-        return CVRepository.search(skill=skill, last_name=last_name, major=major)
+    async def search_cvs(
+            skill: str = Query(default=''),
+            last_name: str = Query(default='', max_length=25),
+            major: str = Query(default='', max_length=25),
+            Authorize: AuthJWT = Depends()
+    ) -> CVsFullRead:
+        return CVRepository.search(skill=skill, last_name=last_name, major=major, Authorize=Authorize)

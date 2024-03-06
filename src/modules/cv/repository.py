@@ -33,7 +33,7 @@ class CVRepository:
         return list_of_cvs
 
     @staticmethod
-    def get(cv_id: str) -> CVFullRead:
+    def get(cv_id: str, Authorize: AuthJWT = Depends()) -> CVFullRead:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
         # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
@@ -90,8 +90,12 @@ class CVRepository:
 
         return response
 
-    @classmethod
-    def update(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
+    @staticmethod
+    def update(
+            cv_id: str,
+            data: CVUpdate,
+            Authorize: AuthJWT = Depends()
+    ) -> CVFullRead:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
         # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
@@ -118,7 +122,7 @@ class CVRepository:
         return model
 
     @staticmethod
-    def get_csv(cv_id: str) -> FileResponse:
+    def get_csv(cv_id: str, Authorize: AuthJWT = Depends()) -> FileResponse:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
         # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
@@ -142,7 +146,12 @@ class CVRepository:
         return response
 
     @staticmethod
-    def search(skill: str, last_name: str, major: str) -> CVsFullRead:
+    def search(
+            skill: str,
+            last_name: str,
+            major: str,
+            Authorize: AuthJWT = Depends()
+    ) -> CVsFullRead:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
         # company_id = CvTable.check_token_permission(
@@ -157,9 +166,9 @@ class CVRepository:
         result = [
             item for item in list_of_cvs
             if all(
-                (skill in item.skills.lower(),
-                 last_name in item.last_name.lower(),
-                 major in item.major.lower())
+                (skill.lower() in item.skills.lower(),
+                 last_name.lower() in item.last_name.lower(),
+                 major.lower() in item.major.lower())
             )
         ]
 
