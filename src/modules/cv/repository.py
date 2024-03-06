@@ -11,7 +11,6 @@ from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file, csv_to_model, clear_csv, model_to_csv
 from modules.cv.table import CvTable
 
-
 __all__ = (
     'CVRepository',
 )
@@ -22,7 +21,10 @@ class CVRepository:
     def list(Authorize: AuthJWT = Depends()) -> CVsFullRead:
         # Authorize.jwt_required()
         # id_from_token = Authorize.get_jwt_subject()
-        # company = CompanyTable.get_company_by_token_id(id_from_token=id_from_token)
+        # company_id = CvTable.check_token_permission(
+        #     id_from_token=id_from_token,
+        #     item_specific=False
+        # )
         company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
 
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
@@ -141,24 +143,24 @@ class CVRepository:
 
     @staticmethod
     def search(skill: str, last_name: str, major: str) -> CVsFullRead:
-        pass
-        # response_from_db = cv_table.scan()
-        #
-        # # Empty DB validation
-        # check_for_404(response_from_db['Items'], message="There is no any CV's in database!")
-        #
-        # # Taking list of items from db_response
-        # scan_result = [CVFullRead(**document) for document in response_from_db['Items']]
-        #
-        # # Filtering
-        # result = [
-        #     item for item in scan_result
-        #     if (skill in item.skills.lower())
-        #        and (last_name in item.last_name.lower())
-        #        and (major in item.major.lower())
-        # ]
-        #
-        # # Empty result list validation
-        # check_for_404(result, message="No matches found!")
-        #
-        # return result
+        # Authorize.jwt_required()
+        # id_from_token = Authorize.get_jwt_subject()
+        # company_id = CvTable.check_token_permission(
+        #     id_from_token=id_from_token,
+        #     item_specific=False
+        # )
+        company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
+
+        list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
+
+        # Filtering
+        result = [
+            item for item in list_of_cvs
+            if all(
+                (skill in item.skills.lower(),
+                 last_name in item.last_name.lower(),
+                 major in item.major.lower())
+            )
+        ]
+
+        return result
