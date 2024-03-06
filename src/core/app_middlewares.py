@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+import logging
 
 __all__ = ('configure_app_middlewares',)
+
+logger = logging.getLogger(__name__)
 
 
 def configure_app_middlewares(application: FastAPI) -> None:
@@ -18,3 +20,12 @@ def configure_app_middlewares(application: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @application.middleware("http")
+    async def cookie_logger(request, call_next):
+        logger.info(f"Request Cookies: {request.cookies}")
+        response = await call_next(request)
+        response_cookies = response.headers.getlist('set-cookie')
+        logger.info(f"Response Cookies: {response_cookies}")
+
+        return response
