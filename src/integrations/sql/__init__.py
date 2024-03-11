@@ -1,5 +1,6 @@
 import logging
 
+import sqlalchemy
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -49,6 +50,10 @@ class SQL_Client:
 def initialize(app: FastAPI, ctx: dict):
     logger.info("Initializing SQL connection...")
     sql_client = SQL_Client()
-    Base.metadata.create_all(sql_client.engine)
-    ctx["sql_client"] = sql_client
-    logger.info("SQL initialized!")
+    try:
+        Base.metadata.create_all(sql_client.engine)
+    except sqlalchemy.exc.OperationalError:
+        logger.error("NO CONNECTION TO SQL DATABASE... Please, check, if its up!")
+    else:
+        ctx["sql_client"] = sql_client
+        logger.info("SQL initialized!")
