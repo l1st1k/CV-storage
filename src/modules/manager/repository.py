@@ -4,10 +4,9 @@ from fastapi import Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
+from modules.auth.models import AuthModel
 from modules.company.models import CompanyInsertAndFullRead
 from modules.company.services import get_company_by_id
-# from core.database import manager_table
-from core.services_auth import AuthModel, verify_password
 from modules.manager.models import *
 from modules.manager.permissions import manager_itself_or_related_company
 
@@ -62,32 +61,6 @@ class ManagerRepository:
         manager_itself_or_related_company(id_from_token=id_from_token, manager=manager)
 
         return manager
-
-    @staticmethod
-    def login(credentials: AuthModel, Authorize: AuthJWT = Depends()):
-        # Getting user from DB
-        manager: ManagerInsertAndFullRead = get_manager_by_email(email=credentials.login)
-
-        # Verifying password
-        if not verify_password(
-                input_password=credentials.password,
-                stored_hashed_password=manager.hashed_password,
-                salt=manager.salt
-        ):
-            raise HTTPException(status_code=401, detail="Bad username or password")
-
-        # Generating tokens
-        access_token = Authorize.create_access_token(subject=manager.manager_id)
-        refresh_token = Authorize.create_refresh_token(subject=manager.manager_id)
-
-        # Response
-        response = JSONResponse(
-            content={
-                "access_token": access_token,
-                "refresh_token": refresh_token
-            },
-            status_code=status.HTTP_200_OK)
-        return response
 
     @staticmethod
     def update(manager_id_from_user: str,

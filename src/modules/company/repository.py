@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from core.services_auth import AuthModel, verify_password
+from modules.auth.models import AuthModel
 from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead, CompanyUpdate)
 from modules.company.services import create_company_model
@@ -47,36 +47,6 @@ class CompanyRepository:
             status_code=status.HTTP_201_CREATED)
         return response
 
-    @staticmethod
-    def login(credentials: AuthModel, Authorize: AuthJWT = Depends()):
-        # Getting user from DB
-        company: CompanyInsertAndFullRead = CompanyTable.get_company_by_email(credentials.login)
-
-        # Verifying password
-        if not verify_password(
-                input_password=credentials.password,
-                stored_hashed_password=company.hashed_password,
-                salt=company.salt
-        ):
-            raise HTTPException(status_code=401, detail="Bad username or password")
-
-        # Generating tokens
-        # TODO set exp_time
-        access_token = Authorize.create_access_token(subject=company.company_id, expires_time=False)
-        refresh_token = Authorize.create_refresh_token(subject=company.company_id, expires_time=False)
-        response = JSONResponse(
-            content={
-                "message": "JWT tokens are placed in HTTP-Only cookies successfully!",
-                "access_token": access_token,
-                "refresh_token": refresh_token
-            },
-            status_code=status.HTTP_200_OK
-        )
-        Authorize.set_access_cookies(access_token, response=response)
-        Authorize.set_refresh_cookies(refresh_token, response=response)
-
-        return response
-# Todo logout and update
     # @staticmethod
     # def update(company_id_from_user: str,
     #            model_from_user: CompanyUpdate,

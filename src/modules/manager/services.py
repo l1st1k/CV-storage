@@ -1,10 +1,7 @@
-# from boto3.dynamodb.conditions import Attr
 from fastapi import HTTPException
 
 from modules.company.models import CompanyInsertAndFullRead
 from modules.company.services import get_company_by_id
-# from core.database import manager_table, company_table
-from core.services_auth import hash_password, AuthModel
 from core.services_general import get_uuid
 from modules.manager.models import *
 

@@ -1,37 +1,6 @@
 from typing import Tuple
 
 import bcrypt
-from fastapi_jwt_auth import AuthJWT
-from pydantic import BaseModel, Field
-
-from core.config import AUTH_KEY
-
-__all__ = (
-    'AuthModel',
-    'hash_password',
-    'verify_password',
-)
-
-
-class Settings(BaseModel):
-    authjwt_secret_key: str = AUTH_KEY
-    authjwt_token_location: set = {"cookies"}
-    authjwt_cookie_csrf_protect: bool = False
-
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
-
-
-class AuthModel(BaseModel):
-    """Model for both auth cases (company & manager)"""
-    login: str = Field(
-        description="Company's or Manager's email"
-    )
-    password: str = Field(
-        description="Account password"
-    )
 
 
 def hash_password(password: str) -> Tuple[bytes, bytes]:

@@ -1,7 +1,7 @@
 from fastapi import Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from core.services_auth import AuthModel
+from modules.auth.models import AuthModel
 from modules.company.models import CompaniesRead, CompanyInsertAndFullRead, CompanyUpdate
 
 from modules.company.repository import CompanyRepository
@@ -17,7 +17,6 @@ class CompanyRouter:
         self.app.get("/companies", response_model=CompaniesRead, tags=("AdminOnly",))(self.list_companies)
         self.app.get("/company/{company_id}", response_model=CompanyInsertAndFullRead, tags=self.tags)(self.get_company)
         self.app.post("/register_company", response_class=JSONResponse, tags=self.tags)(self.register_company)
-        self.app.post("/login_as_company", response_class=JSONResponse, tags=self.tags)(self.login_as_company)
         self.app.patch("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.update_company)
         self.app.delete("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.delete_company)
 
@@ -36,14 +35,6 @@ class CompanyRouter:
             password=password
         )
         return CompanyRepository.create(name=name, credentials=credentials, photo=photo)
-
-    @staticmethod
-    async def login_as_company(login: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        credentials = AuthModel(
-            login=login,
-            password=password
-        )
-        return CompanyRepository.login(credentials=credentials, Authorize=Authorize)
 
     @staticmethod
     async def update_company(company_id: str, model: CompanyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
