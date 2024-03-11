@@ -62,6 +62,13 @@ class CompanyTable(Base, TableMixin):
         pass
 
     @classmethod
+    def get_company_by_email(cls, email) -> CompanyInsertAndFullRead:
+        with cls.session_manager() as session:
+            company_row: Type[CompanyTable] = session.query(cls).filter_by(email=email).first()
+            check_for_404(company_row, "No Company with such email")
+            return CompanyInsertAndFullRead(**cls.to_dict(company_row))
+
+    @classmethod
     def create(cls, model: CompanyInsertAndFullRead) -> Optional[str]:
         with cls.session_manager() as session:
             obj = cls.from_model(model)
