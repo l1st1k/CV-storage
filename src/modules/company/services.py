@@ -8,7 +8,6 @@ from core.services_general import get_uuid
 from modules.company.models import CompanyInsertAndFullRead, CompanyUpdate
 
 __all__ = (
-    'check_photo_type',
     'create_company_model',
     'get_company_by_email',
     'get_company_by_id',
@@ -26,10 +25,13 @@ def check_photo_type(photo: UploadFile) -> None:
             'image/png',
             'image/jpg')
     ):
-        raise TypeError
+        raise HTTPException(status_code=415, detail='Unsupported media type for photo. Please use "png/jpeg/jpg"')
 
 
 def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -> CompanyInsertAndFullRead:
+    # Type check
+    check_photo_type(photo)
+
     # Photo into base 64
     encoded_string: bytes = b64encode(photo.file.read())
 

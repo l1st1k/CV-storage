@@ -1,5 +1,6 @@
+import logging
 import uuid
-from typing import Type, List
+from typing import Type, List, Optional
 
 from sqlalchemy import Column, String, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID
@@ -9,6 +10,9 @@ from core.services_general import TableMixin, check_for_404
 from integrations.sql.sqlalchemy_base import Base
 from modules.company.models import CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
 from modules.cv.models import CVsFullRead, CVFullRead
+
+
+logger = logging.getLogger(__name__)
 
 
 class CompanyTable(Base, TableMixin):
@@ -25,6 +29,17 @@ class CompanyTable(Base, TableMixin):
     cvs = relationship("CvTable", back_populates="company")
     managers = relationship("ManagerTable", back_populates="company")
     vacancies = relationship("VacancyTable", back_populates="company")
+
+    @classmethod
+    def from_model(cls, model: CompanyInsertAndFullRead):
+        return cls(
+            company_id=uuid.UUID(model.company_id),
+            company_name=model.company_name,
+            email=model.email,
+            hashed_password=model.hashed_password,
+            salt=model.salt,
+            logo_in_bytes=model.logo_in_bytes if model.logo_in_bytes else None
+        )
 
     @classmethod
     def get_companies(cls) -> CompaniesRead:
@@ -45,3 +60,11 @@ class CompanyTable(Base, TableMixin):
     def get_company_by_token_id(cls, id_from_token):
         # TODO (Manager model required)
         pass
+
+    @classmethod
+    def create(cls, model: CompanyInsertAndFullRead) -> Optional[str]:
+        with cls.session_manager() as session:
+            obj = cls.from_model(model)
+            session.add(obj)
+            logging.info(f"New Company registered: {model.company_name}")
+            return model.company_id

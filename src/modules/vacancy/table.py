@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
-from modules.company.table import CompanyTable
+# from modules.company.table import CompanyTable
 from modules.vacancy.models import VacancyInsertAndFullRead
 
 

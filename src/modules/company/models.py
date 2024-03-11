@@ -81,7 +81,7 @@ class CompanyInsertAndFullRead(BaseModel):
     managers: Optional[Set[str]] = CompanyFields.managers
     vacancies: Optional[Set[str]] = CompanyFields.vacancies
     cvs: Optional[Set[str]] = CompanyFields.cvs
-    logo_in_bytes: str = CompanyFields.logo_in_bytes
+    logo_in_bytes: bytes = CompanyFields.logo_in_bytes
 
 
 class CompanyShortRead(BaseModel):
