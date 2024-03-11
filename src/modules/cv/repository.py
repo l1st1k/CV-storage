@@ -34,9 +34,9 @@ class CVRepository:
 
     @staticmethod
     def get(cv_id: str, Authorize: AuthJWT = Depends()) -> CVFullRead:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
 
         item = CvTable.retrieve(cv_id=cv_id)
         return item
@@ -51,7 +51,7 @@ class CVRepository:
         #     item_specific=False
         # )
 
-        company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
+        company_id = "322d40b3-d7a6-4dca-b95e-a93030481f35"
 
         # Type check
         if file and (file.content_type != 'text/csv'):

@@ -7,7 +7,6 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
-from modules.company.table import CompanyTable
 from modules.cv.models import CVInsertIntoDB, CVFullRead, CVUpdate
 from modules.cv.services import b64_to_file
 
@@ -55,14 +54,17 @@ class CvTable(Base, TableMixin):
             cv_id: str = None,
             item_specific: bool = True
     ) -> str:
-        company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+        with cls.session_manager() as session:
+            from modules.company.table import CompanyTable
+            company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+            session.add(company)
 
-        if item_specific:
-            cv_ids = [cv.cv_id for cv in company.cvs]
-            if cv_id not in cv_ids:
-                raise NO_PERMISSION_EXCEPTION
+            if item_specific:
+                cv_ids = [cv.cv_id for cv in company.cvs]
+                if uuid.UUID(cv_id) not in cv_ids:
+                    raise NO_PERMISSION_EXCEPTION
 
-        return company.company_id
+            return company.company_id
 
     @classmethod
     def create(cls, model: CVInsertIntoDB) -> Optional[str]:

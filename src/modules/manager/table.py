@@ -7,7 +7,6 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
-# from modules.company.table import CompanyTable
 from modules.manager.models import ManagerInsertAndFullRead
 
 
@@ -40,14 +39,17 @@ class ManagerTable(Base, TableMixin):
             manager_id: str = None,
             item_specific: bool = True
     ) -> str:
-        company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+        with cls.session_manager() as session:
+            from modules.company.table import CompanyTable
+            company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+            session.add(company)
 
-        if item_specific:
-            manager_ids = [manager.manager_id for manager in company.managers]
-            if manager_id not in manager_ids:
-                raise NO_PERMISSION_EXCEPTION
+            if item_specific:
+                manager_ids = [manager.manager_id for manager in company.managers]
+                if uuid.UUID(manager_id) not in manager_ids:
+                    raise NO_PERMISSION_EXCEPTION
 
-        return company.company_id
+            return company.company_id
     #
     # @classmethod
     # def create(cls, model: CVInsertIntoDB) -> Optional[str]:
