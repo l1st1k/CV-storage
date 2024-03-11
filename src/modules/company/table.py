@@ -23,8 +23,8 @@ class CompanyTable(Base, TableMixin):
 
     # Relationships
     cvs = relationship("CvTable", back_populates="company")
-    # managers = relationship("ManagerTable", back_populates="company")
-    # vacancies = relationship("VacancyTable", back_populates="company")
+    managers = relationship("ManagerTable", back_populates="company")
+    vacancies = relationship("VacancyTable", back_populates="company")
 
     @classmethod
     def get_companies(cls) -> CompaniesRead:
