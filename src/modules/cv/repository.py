@@ -11,10 +11,6 @@ from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file, csv_to_model, clear_csv, model_to_csv
 from modules.cv.table import CvTable
 
-__all__ = (
-    'CVRepository',
-)
-
 
 class CVRepository:
     @staticmethod

@@ -7,12 +7,6 @@ from modules.auth.services import verify_password
 from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead, CompanyUpdate)
 from modules.company.table import CompanyTable
-
-
-__all__ = (
-    'AuthRepository',
-)
-
 from modules.manager.models import ManagerInsertAndFullRead
 from modules.manager.table import ManagerTable
 

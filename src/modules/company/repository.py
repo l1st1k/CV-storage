@@ -9,11 +9,6 @@ from modules.company.services import create_company_model
 from modules.company.table import CompanyTable
 
 
-__all__ = (
-    'CompanyRepository',
-)
-
-
 class CompanyRepository:
     @staticmethod
     def list() -> CompaniesRead:
