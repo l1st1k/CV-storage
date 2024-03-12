@@ -50,6 +50,14 @@ class ManagerTable(Base, TableMixin):
                     raise NO_PERMISSION_EXCEPTION
 
             return company.company_id
+
+    @classmethod
+    def get_manager_by_email(cls, email: str) -> ManagerInsertAndFullRead:
+        with cls.session_manager() as session:
+            manager_row: Type[ManagerTable] = session.query(cls).filter_by(email=email).first()
+            check_for_404(manager_row, "No Manager with such email")
+            return ManagerInsertAndFullRead(**cls.to_dict(manager_row))
+
     #
     # @classmethod
     # def create(cls, model: CVInsertIntoDB) -> Optional[str]:

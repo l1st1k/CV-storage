@@ -27,7 +27,6 @@ class AuthRepository:
         if as_company:
             obj: CompanyInsertAndFullRead = CompanyTable.get_company_by_email(credentials.login)
         else:
-            # TODO continue
             obj: ManagerInsertAndFullRead = ManagerTable.get_manager_by_email(credentials.login)
 
         # Verifying password
