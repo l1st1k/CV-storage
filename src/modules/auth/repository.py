@@ -56,8 +56,19 @@ class AuthRepository:
 
     @staticmethod
     def refresh(Authorize: AuthJWT = Depends()):
-        # TODO continue
-        pass
+        Authorize.jwt_refresh_token_required()
+        id_from_token = Authorize.get_jwt_subject()
+        new_access_token = Authorize.create_access_token(subject=id_from_token)
+
+        response = JSONResponse(
+            content={
+                "message": "Updated access token is placed in HTTP-Only cookie successfully!"
+            },
+            status_code=status.HTTP_200_OK
+        )
+        Authorize.set_access_cookies(new_access_token, response=response)
+
+        return response
 
     @staticmethod
     def logout(Authorize: AuthJWT = Depends()):
