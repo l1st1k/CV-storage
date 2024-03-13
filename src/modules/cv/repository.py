@@ -32,7 +32,7 @@ class CVRepository:
     def get(cv_id: str, Authorize: AuthJWT = Depends()) -> CVFullRead:
         Authorize.jwt_required()
         id_from_token = Authorize.get_jwt_subject()
-        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token, item_specific=True)
 
         item = CvTable.retrieve(cv_id=cv_id)
         return item

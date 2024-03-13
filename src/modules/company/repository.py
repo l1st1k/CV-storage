@@ -15,18 +15,17 @@ class CompanyRepository:
         list_of_companies: CompaniesRead = CompanyTable.get_companies()
 
         return list_of_companies
-    #
-    # @staticmethod
-    # def get(company_id_from_user: str, Authorize: AuthJWT = Depends()) -> CompanyInsertAndFullRead:
-    #     Authorize.jwt_required()
-    #     company_id_from_token = Authorize.get_jwt_subject()
-    #
-    #     # Permission check
-    #     if company_id_from_token != company_id_from_user:
-    #         raise HTTPException(status_code=403, detail='No permissions')
-    #
-    #     company: CompanyInsertAndFullRead = get_company_by_id(company_id=company_id_from_token)
-    #     return company
+
+    @staticmethod
+    def get(Authorize: AuthJWT = Depends()) -> CompanyShortRead:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+
+        company: CompanyShortRead = CompanyTable.get_company_by_token_id(
+            id_from_token=id_from_token,
+            return_model=True
+        )
+        return company
 
     @staticmethod
     def create(name: str, credentials: AuthModel, photo: UploadFile) -> JSONResponse:

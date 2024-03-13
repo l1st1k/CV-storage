@@ -58,23 +58,25 @@ class CompanyTable(Base, TableMixin):
             return [CVFullRead(**cls.to_dict(document)) for document in row.cvs]
 
     @classmethod
-    def get_company_by_token_id(cls, id_from_token: str):
+    def get_company_by_token_id(cls, id_from_token: str, return_model: bool = False):
         with cls.session_manager() as session:
             company_row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(id_from_token)).first()
             if company_row:
-                return company_row
+                response = company_row
             else:
                 from modules.manager.table import ManagerTable
                 manager_row: Type[ManagerTable] = session.query(ManagerTable).filter_by(
                     manager_id=uuid.UUID(id_from_token)
                 ).first()
                 if manager_row:
-                    return manager_row.company
+                    response = manager_row.company
                 else:
                     raise HTTPException(
                         status_code=401,
                         detail='There is no manager or company with ID from your token!'
                     )
+
+            return CompanyShortRead(**cls.to_dict(response)) if return_model else response
 
     @classmethod
     def get_company_by_email(cls, email) -> CompanyInsertAndFullRead:
