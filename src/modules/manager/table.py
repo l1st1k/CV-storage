@@ -49,7 +49,7 @@ class ManagerTable(Base, TableMixin):
                 if uuid.UUID(manager_id) not in manager_ids:
                     raise NO_PERMISSION_EXCEPTION
 
-            return company.company_id
+            return str(company.company_id)
 
     @classmethod
     def get_manager_by_email(cls, email: str) -> ManagerInsertAndFullRead:

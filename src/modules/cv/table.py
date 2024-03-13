@@ -64,7 +64,7 @@ class CvTable(Base, TableMixin):
                 if uuid.UUID(cv_id) not in cv_ids:
                     raise NO_PERMISSION_EXCEPTION
 
-            return company.company_id
+            return str(company.company_id)
 
     @classmethod
     def create(cls, model: CVInsertIntoDB) -> Optional[str]:

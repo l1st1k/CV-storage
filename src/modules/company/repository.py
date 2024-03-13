@@ -63,33 +63,17 @@ class CompanyRepository:
     #         status_code=status.HTTP_200_OK
     #     )
     #     return response
-    #
-    # @staticmethod
-    # def delete(company_id_from_user: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     Authorize.jwt_required()
-    #     company_id_from_token = Authorize.get_jwt_subject()
-    #
-    #     # Permission check
-    #     if company_id_from_token != company_id_from_user:
-    #         raise HTTPException(status_code=403, detail='No permissions')
-    #
-    #     # Querying deletion from DB
-    #     db_response = company_table.delete_item(
-    #         Key={
-    #             'company_id': company_id_from_user
-    #         }
-    #     )
-    #
-    #     # 404 validation
-    #     if 'ConsumedCapacity' in db_response:
-    #         raise HTTPException(
-    #             status_code=404,
-    #             detail='Company not found.'
-    #         )
-    #
-    #     # Response
-    #     response = JSONResponse(
-    #             content="Company successfully deleted!",
-    #             status_code=status.HTTP_200_OK
-    #         )
-    #     return response
+
+    @staticmethod
+    def delete(Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = CompanyTable.check_token_permission(id_from_token)
+
+        CompanyTable.delete(company_id)
+
+        response = JSONResponse(
+                content="Company successfully deleted!",
+                status_code=status.HTTP_200_OK
+            )
+        return response

@@ -49,7 +49,7 @@ class VacancyTable(Base, TableMixin):
                 if uuid.UUID(vacancy_id) not in vacancy_ids:
                     raise NO_PERMISSION_EXCEPTION
 
-            return company.company_id
+            return str(company.company_id)
     #
     # @classmethod
     # def create(cls, model: CVInsertIntoDB) -> Optional[str]:

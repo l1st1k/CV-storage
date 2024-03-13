@@ -7,7 +7,7 @@ from sqlalchemy import Column, String, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from core.services_general import TableMixin, check_for_404
+from core.services_general import TableMixin, check_for_404, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
 from modules.company.models import CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
 from modules.cv.models import CVsFullRead, CVFullRead
@@ -92,3 +92,24 @@ class CompanyTable(Base, TableMixin):
             session.add(obj)
             logging.info(f"New Company registered: {model.company_name}")
             return model.company_id
+
+    @classmethod
+    def check_token_permission(
+            cls,
+            id_from_token: str
+    ) -> str:
+        with cls.session_manager() as session:
+            company: CompanyTable = CompanyTable.get_company_by_token_id(id_from_token)
+            session.add(company)
+
+            if uuid.UUID(id_from_token) != company.company_id:
+                raise NO_PERMISSION_EXCEPTION
+
+            return str(company.company_id)
+
+    @classmethod
+    def delete(cls, company_id: str) -> None:
+        with cls.session_manager() as session:
+            company_row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(company_id)).first()
+            check_for_404(company_row, "No Company with such ID")
+            session.delete(company_row)

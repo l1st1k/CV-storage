@@ -18,7 +18,7 @@ class CompanyRouter:
         self.app.get("/company", response_model=CompanyShortRead, tags=self.tags)(self.get_company)
         self.app.post("/register_company", response_class=JSONResponse, tags=self.tags)(self.register_company)
         self.app.patch("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.update_company)
-        self.app.delete("/company/{company_id}", response_class=JSONResponse, tags=self.tags)(self.delete_company)
+        self.app.delete("/company", response_class=JSONResponse, tags=self.tags)(self.delete_company)
 
     @staticmethod
     async def list_companies() -> CompaniesRead:
@@ -41,5 +41,5 @@ class CompanyRouter:
         return CompanyRepository.update(company_id_from_user=company_id, model_from_user=model, Authorize=Authorize)
 
     @staticmethod
-    async def delete_company(company_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        return CompanyRepository.delete(company_id_from_user=company_id, Authorize=Authorize)
+    async def delete_company(Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return CompanyRepository.delete(Authorize=Authorize)
