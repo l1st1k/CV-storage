@@ -11,8 +11,9 @@ __all__ = (
 )
 
 # Env variables
-config = dotenv_values("src/.env")  # TODO remove local path
-# config = dotenv_values(".env")
+config = dotenv_values(".env")
+if not config:
+    config = dotenv_values("src/.env")
 
 
 AUTH_KEY = config["AUTH_KEY"]
