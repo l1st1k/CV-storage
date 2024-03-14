@@ -15,16 +15,14 @@ from modules.cv.table import CvTable
 class CVRepository:
     @staticmethod
     def list(Authorize: AuthJWT = Depends()) -> CVsFullRead:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # company_id = CvTable.check_token_permission(
-        #     id_from_token=id_from_token,
-        #     item_specific=False
-        # )
-        company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = CvTable.check_token_permission(
+            id_from_token=id_from_token,
+            item_specific=False
+        )
 
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
-        # list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company.company_id)
 
         return list_of_cvs
 
@@ -40,14 +38,12 @@ class CVRepository:
     @staticmethod
     def create(file: UploadFile, Authorize: AuthJWT = Depends()) -> JSONResponse:
         """Uploads a CV and returns its id"""
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # company_id = CvTable.check_token_permission(
-        #     id_from_token=id_from_token,
-        #     item_specific=False
-        # )
-
-        company_id = "322d40b3-d7a6-4dca-b95e-a93030481f35"
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = CvTable.check_token_permission(
+            id_from_token=id_from_token,
+            item_specific=False
+        )
 
         # Type check
         if file and (file.content_type != 'text/csv'):
@@ -92,9 +88,9 @@ class CVRepository:
             data: CVUpdate,
             Authorize: AuthJWT = Depends()
     ) -> CVFullRead:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
 
         # Updating model's fields
         model = CvTable.get_updated_model(cv_id, data)
@@ -119,18 +115,18 @@ class CVRepository:
 
     @staticmethod
     def get_csv(cv_id: str, Authorize: AuthJWT = Depends()) -> FileResponse:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
 
         title = CvTable.get_csv(cv_id=cv_id)
         return FileResponse(title)
 
     @staticmethod
     def delete(cv_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
 
         CvTable.delete(cv_id=cv_id)
 
@@ -148,13 +144,12 @@ class CVRepository:
             major: str,
             Authorize: AuthJWT = Depends()
     ) -> CVsFullRead:
-        # Authorize.jwt_required()
-        # id_from_token = Authorize.get_jwt_subject()
-        # company_id = CvTable.check_token_permission(
-        #     id_from_token=id_from_token,
-        #     item_specific=False
-        # )
-        company_id = "3422b448-2460-5fd2-9183-8999de6f8343"
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = CvTable.check_token_permission(
+            id_from_token=id_from_token,
+            item_specific=False
+        )
 
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
 
