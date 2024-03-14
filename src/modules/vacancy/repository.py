@@ -4,7 +4,6 @@ from fastapi_jwt_auth import AuthJWT
 
 from core.services_general import get_uuid
 from modules.company.models import CompanyInsertAndFullRead
-from modules.company.services import get_company_by_id
 from modules.vacancy.models import *
 from modules.vacancy.services import *
 

@@ -15,10 +15,6 @@ __all__ = (
 )
 
 
-#  Settings
-logging.basicConfig(level=logging.INFO)
-
-
 def model_to_csv(model: CVFullRead) -> str:
     """Writes local .csv file from model"""
     cv_dict = dict(model)

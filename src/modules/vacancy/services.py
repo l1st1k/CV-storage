@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 
 from modules.company.models import CompanyInsertAndFullRead
-from modules.company.services import get_company_by_id
 from modules.vacancy.models import *
 
 __all__ = (

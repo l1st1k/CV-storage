@@ -66,9 +66,6 @@ class CompanyUpdate(BaseModel):
     email: Optional[str] = CompanyFields.email
     new_password: Optional[str] = CompanyFields.new_password
     new_photo: Optional[UploadFile] = CompanyFields.new_photo
-    managers: Optional[Set[str]] = CompanyFields.managers
-    vacancies: Optional[Set[str]] = CompanyFields.vacancies
-    cvs: Optional[Set[str]] = CompanyFields.cvs
 
 
 class CompanyInsertAndFullRead(BaseModel):

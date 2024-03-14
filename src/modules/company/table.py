@@ -113,3 +113,15 @@ class CompanyTable(Base, TableMixin):
             company_row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(company_id)).first()
             check_for_404(company_row, "No Company with such ID")
             session.delete(company_row)
+
+    @classmethod
+    def update(cls, attrs: dict) -> None:
+        with cls.session_manager() as session:
+            row: Type[CompanyTable] = session.query(cls).filter_by(
+                company_id=uuid.UUID(attrs.get("company_id"))
+            ).first()
+            check_for_404(row, "No Company with such ID")
+            attrs.pop("company_id")
+            for field, value in attrs.items():
+                if value:
+                    setattr(row, field, value)

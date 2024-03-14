@@ -1,11 +1,11 @@
-from fastapi import Depends, HTTPException, UploadFile, status
+from fastapi import Depends, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from modules.auth.models import AuthModel
 from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead, CompanyUpdate)
-from modules.company.services import create_company_model
+from modules.company.services import create_company_model, get_updated_company_model_attrs
 from modules.company.table import CompanyTable
 
 
@@ -41,28 +41,22 @@ class CompanyRepository:
             status_code=status.HTTP_201_CREATED)
         return response
 
-    # @staticmethod
-    # def update(company_id_from_user: str,
-    #            model_from_user: CompanyUpdate,
-    #            Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     Authorize.jwt_required()
-    #     company_id_from_token = Authorize.get_jwt_subject()
-    #
-    #     # Permission check
-    #     if company_id_from_token != company_id_from_user:
-    #         raise HTTPException(status_code=403, detail="You're not allowed to access other companies!")
-    #
-    #     # Database logic
-    #     update_company_model(company_id=company_id_from_user, model=model_from_user)
-    #
-    #     # Response
-    #     response = JSONResponse(
-    #         content={
-    #             "message": "Company's profile updated successfully!"
-    #         },
-    #         status_code=status.HTTP_200_OK
-    #     )
-    #     return response
+    @staticmethod
+    def update(updated_model: CompanyUpdate,
+               Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = CompanyTable.check_token_permission(id_from_token)
+
+        attrs: dict = get_updated_company_model_attrs(updated_model)
+        attrs.update({'company_id': company_id})
+        CompanyTable.update(attrs)
+
+        response = JSONResponse(
+            content="Company successfully updated!",
+            status_code=status.HTTP_200_OK
+        )
+        return response
 
     @staticmethod
     def delete(Authorize: AuthJWT = Depends()) -> JSONResponse:
