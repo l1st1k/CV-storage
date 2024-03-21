@@ -12,8 +12,8 @@ routers = [
     AuthRouter,
     CompanyRouter,
     CVRouter,
-    # ManagerRouter, # TODO enable routers
-    # VacancyRouter,
+    ManagerRouter,
+    # VacancyRouter,  # TODO enable routers
 ]
 
 

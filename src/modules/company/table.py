@@ -11,7 +11,8 @@ from core.services_general import TableMixin, check_for_404, NO_PERMISSION_EXCEP
 from integrations.sql.sqlalchemy_base import Base
 from modules.company.models import CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
 from modules.cv.models import CVsFullRead, CVFullRead
-
+from modules.manager.models import ManagersRead, ManagerShortRead
+from modules.vacancy.models import VacancyShortRead, VacanciesRead
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,22 @@ class CompanyTable(Base, TableMixin):
             check_for_404(row, "No company with such ID")
             check_for_404(row.cvs, "No CVs in a company")
             return [CVFullRead(**cls.to_dict(document)) for document in row.cvs]
+
+    @classmethod
+    def get_managers(cls, company_id: str) -> ManagersRead:
+        with cls.session_manager() as session:
+            row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(company_id)).first()
+            check_for_404(row, "No company with such ID")
+            check_for_404(row.managers, "No managers in a company")
+            return [ManagerShortRead(**cls.to_dict(document)) for document in row.managers]
+
+    @classmethod
+    def get_vacancies(cls, company_id: str) -> VacanciesRead:
+        with cls.session_manager() as session:
+            row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(company_id)).first()
+            check_for_404(row, "No company with such ID")
+            check_for_404(row.vacancies, "No vacancies in a company")
+            return [VacancyShortRead(**cls.to_dict(document)) for document in row.vacancies]
 
     @classmethod
     def get_company_by_token_id(cls, id_from_token: str, return_model: bool = False):

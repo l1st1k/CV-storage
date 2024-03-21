@@ -154,6 +154,7 @@ class CVRepository:
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
 
         # Filtering
+        # TODO investigate if fastapi_filters is suitable here
         result = [
             item for item in list_of_cvs
             if all(
