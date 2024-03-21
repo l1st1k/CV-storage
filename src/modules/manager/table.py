@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Optional, Type
 
@@ -58,15 +59,14 @@ class ManagerTable(Base, TableMixin):
             check_for_404(manager_row, "No Manager with such email")
             return ManagerInsertAndFullRead(**cls.to_dict(manager_row))
 
-    #
-    # @classmethod
-    # def create(cls, model: CVInsertIntoDB) -> Optional[str]:
-    #     with cls.session_manager() as session:
-    #         obj = cls.from_model(model)
-    #         session.add(obj)
-    #
-    #         return model.cv_id
-    #
+    @classmethod
+    def create(cls, model: ManagerInsertAndFullRead) -> Optional[str]:
+        with cls.session_manager() as session:
+            obj = cls.from_model(model)
+            session.add(obj)
+            logging.info(f"Registered new manager: '{model.email}'!")
+            return model.manager_id
+
     @classmethod
     def retrieve(cls, manager_id: str) -> ManagerShortRead:
         with cls.session_manager() as session:
@@ -74,14 +74,6 @@ class ManagerTable(Base, TableMixin):
             check_for_404(row, "No manager with such ID")
 
             return ManagerShortRead(**cls.to_dict(row))
-    #
-    # @classmethod
-    # def get_updated_model(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
-    #     model: CVFullRead = cls.retrieve(cv_id)
-    #     updated_fields = data.dict(exclude_none=True)
-    #     updated_model = model.copy(update=updated_fields)
-    #
-    #     return updated_model
     #
     # @classmethod
     # def update(cls, model: CVInsertIntoDB) -> CVFullRead:
