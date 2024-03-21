@@ -25,8 +25,8 @@ class ManagerRouter:
         return ManagerRepository.list(Authorize=Authorize)
 
     @staticmethod
-    async def get_manager(manager_id: str, Authorize: AuthJWT = Depends()) -> ManagerInsertAndFullRead:
-        return ManagerRepository.get(manager_id_from_user=manager_id, Authorize=Authorize)
+    async def get_manager(manager_id: str, Authorize: AuthJWT = Depends()) -> ManagerShortRead:
+        return ManagerRepository.get(manager_id=manager_id, Authorize=Authorize)
 
     # @staticmethod
     # async def register_manager(email: str, password: str, Authorize: AuthJWT = Depends()) -> JSONResponse:

@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 
 from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
 from integrations.sql.sqlalchemy_base import Base
-from modules.manager.models import ManagerInsertAndFullRead
+from modules.manager.models import ManagerInsertAndFullRead, ManagerShortRead
 
 
 class ManagerTable(Base, TableMixin):
@@ -67,13 +67,13 @@ class ManagerTable(Base, TableMixin):
     #
     #         return model.cv_id
     #
-    # @classmethod
-    # def retrieve(cls, cv_id: str) -> CVFullRead:
-    #     with cls.session_manager() as session:
-    #         row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
-    #         check_for_404(row, "No CV with such ID")
-    #
-    #         return CVFullRead(**cls.to_dict(row))
+    @classmethod
+    def retrieve(cls, manager_id: str) -> ManagerShortRead:
+        with cls.session_manager() as session:
+            row: Type[ManagerTable] = session.query(cls).filter_by(manager_id=uuid.UUID(manager_id)).first()
+            check_for_404(row, "No manager with such ID")
+
+            return ManagerShortRead(**cls.to_dict(row))
     #
     # @classmethod
     # def get_updated_model(cls, cv_id: str, data: CVUpdate) -> CVFullRead:

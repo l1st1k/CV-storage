@@ -1,14 +1,9 @@
-import logging
-
-from fastapi import Depends, status, HTTPException
+from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from modules.auth.models import AuthModel
-from modules.company.models import CompanyInsertAndFullRead
 from modules.company.table import CompanyTable
 from modules.manager.models import *
-from modules.manager.permissions import manager_itself_or_related_company
 from modules.manager.table import ManagerTable
 
 
@@ -52,19 +47,16 @@ class ManagerRepository:
     #         },
     #         status_code=status.HTTP_201_CREATED)
     #     return response
-    #
-    # @staticmethod
-    # def get(manager_id_from_user: str, Authorize: AuthJWT = Depends()) -> ManagerInsertAndFullRead:
-    #     Authorize.jwt_required()
-    #     id_from_token = Authorize.get_jwt_subject()
-    #
-    #     # Getting manager from DB
-    #     manager: ManagerInsertAndFullRead = get_manager_by_id(manager_id=manager_id_from_user)
-    #
-    #     # Permissions check
-    #     manager_itself_or_related_company(id_from_token=id_from_token, manager=manager)
-    #
-    #     return manager
+
+    @staticmethod
+    def get(manager_id: str, Authorize: AuthJWT = Depends()) -> ManagerShortRead:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        ManagerTable.check_token_permission(manager_id=manager_id, id_from_token=id_from_token, item_specific=True)
+
+        item = ManagerTable.retrieve(manager_id=manager_id)
+        return item
+
     #
     # @staticmethod
     # def update(manager_id_from_user: str,
