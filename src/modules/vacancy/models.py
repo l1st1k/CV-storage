@@ -1,4 +1,4 @@
-from typing import Set, Optional, List
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -34,20 +34,20 @@ class VacancyFields:
     )
     skills = Field(
         description='List of employee skills',
-        example=["python", "c++", "terraform", "CSS"]
+        example="python, c++, terraform, CSS"
     )
 
 
 class VacancyUpdate(BaseModel):
     major: Optional[str] = VacancyFields.major
     years_of_exp: Optional[int] = VacancyFields.years_of_exp
-    skills: Optional[Set[str]] = VacancyFields.skills
+    skills: Optional[str] = VacancyFields.skills
 
 
 class VacancyCreate(VacancyUpdate):
     major: str = VacancyFields.major
     years_of_exp: int = VacancyFields.years_of_exp
-    skills: Set[str] = VacancyFields.skills
+    skills: str = VacancyFields.skills
 
 
 class VacancyShortRead(BaseModel):
@@ -61,4 +61,4 @@ VacanciesRead = List[VacancyShortRead]
 
 
 class VacancyInsertAndFullRead(VacancyShortRead):
-    skills: Optional[Set[str]] = VacancyFields.skills
+    skills: Optional[str] = VacancyFields.skills
