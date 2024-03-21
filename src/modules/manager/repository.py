@@ -5,7 +5,7 @@ from fastapi_jwt_auth import AuthJWT
 from modules.auth.models import AuthModel
 from modules.company.table import CompanyTable
 from modules.manager.models import *
-from modules.manager.services import create_manager_model
+from modules.manager.services import create_manager_model, get_updated_manager_model_attrs
 from modules.manager.table import ManagerTable
 
 
@@ -29,8 +29,7 @@ class ManagerRepository:  # Todo test: list, get, post, update, delete
         id_from_token = Authorize.get_jwt_subject()
         ManagerTable.check_token_permission(
             manager_id=manager_id,
-            id_from_token=id_from_token,
-            item_specific=True
+            id_from_token=id_from_token
         )
 
         item = ManagerTable.retrieve(manager_id=manager_id)
@@ -56,23 +55,27 @@ class ManagerRepository:  # Todo test: list, get, post, update, delete
             },
             status_code=status.HTTP_201_CREATED)
         return response
-    #
-    # @staticmethod
-    # def update(updated_model: CompanyUpdate,
-    #            Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     Authorize.jwt_required()
-    #     id_from_token = Authorize.get_jwt_subject()
-    #     company_id = CompanyTable.check_token_permission(id_from_token)
-    #
-    #     attrs: dict = get_updated_company_model_attrs(updated_model)
-    #     attrs.update({'company_id': company_id})
-    #     CompanyTable.update(attrs)
-    #
-    #     response = JSONResponse(
-    #         content="Company successfully updated!",
-    #         status_code=status.HTTP_200_OK
-    #     )
-    #     return response
+
+    @staticmethod
+    def update(manager_id: str,
+               updated_model: ManagerUpdate,
+               Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = ManagerTable.check_token_permission(
+            manager_id=manager_id,
+            id_from_token=id_from_token
+        )
+
+        attrs: dict = get_updated_manager_model_attrs(updated_model)
+        attrs.update({'company_id': company_id, 'manager_id': manager_id})
+        ManagerTable.update(attrs)
+
+        response = JSONResponse(
+            content="Manager successfully updated!",
+            status_code=status.HTTP_200_OK
+        )
+        return response
     #
     # @staticmethod
     # def delete(Authorize: AuthJWT = Depends()) -> JSONResponse:

@@ -35,11 +35,11 @@ class ManagerRouter:
             password=password
         )
         return ManagerRepository.create(credentials=credentials, Authorize=Authorize)
-    #
-    # @staticmethod
-    # async def update_manager(manager_id: str, model: ManagerUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     return ManagerRepository.update(manager_id_from_user=manager_id, model_from_user=model, Authorize=Authorize)
-    #
+
+    @staticmethod
+    async def update_manager(manager_id: str, model: ManagerUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        return ManagerRepository.update(manager_id=manager_id, updated_model=model, Authorize=Authorize)
+
     # @staticmethod
     # async def delete_manager(manager_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     return ManagerRepository.delete(manager_id_from_user=manager_id, Authorize=Authorize)
+    #     return ManagerRepository.delete(manager_id=manager_id, Authorize=Authorize)

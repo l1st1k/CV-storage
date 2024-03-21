@@ -74,17 +74,19 @@ class ManagerTable(Base, TableMixin):
             check_for_404(row, "No manager with such ID")
 
             return ManagerShortRead(**cls.to_dict(row))
-    #
-    # @classmethod
-    # def update(cls, model: CVInsertIntoDB) -> CVFullRead:
-    #     with cls.session_manager() as session:
-    #         row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(model.cv_id)).first()
-    #         check_for_404(row, "No CV with such ID")
-    #         for field, value in model.dict(exclude={'cv_id'}).items():
-    #             setattr(row, field, value)
-    #
-    #         return CVFullRead(**cls.to_dict(row))
-    #
+
+    @classmethod
+    def update(cls, attrs: dict) -> None:
+        with cls.session_manager() as session:
+            row: Type[ManagerTable] = session.query(cls).filter_by(
+                manager_id=uuid.UUID(attrs.get("manager_id"))
+            ).first()
+            check_for_404(row, "No manager with such ID")
+            attrs.pop("manager_id")
+            for field, value in attrs.items():
+                if value:
+                    setattr(row, field, value)
+
     # @classmethod
     # def delete(cls, cv_id: str) -> None:
     #     with cls.session_manager() as session:

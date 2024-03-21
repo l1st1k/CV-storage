@@ -23,4 +23,13 @@ def create_manager_model(company_id: str, credentials: AuthModel) -> ManagerInse
 
 
 def get_updated_manager_model_attrs(model: ManagerUpdate) -> dict:
-    pass
+    attributes: dict = model.dict()
+
+    if model.new_password:
+        # Generate unique salt and hash the password
+        hashed_password, salt = hash_password(model.new_password)
+        attributes.pop('new_password')
+        attributes.update({'hashed_password': hashed_password,
+                           'salt': salt})
+
+    return attributes
