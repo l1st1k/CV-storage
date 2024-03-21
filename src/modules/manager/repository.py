@@ -76,17 +76,18 @@ class ManagerRepository:  # Todo test: list, get, post, update, delete
             status_code=status.HTTP_200_OK
         )
         return response
-    #
-    # @staticmethod
-    # def delete(Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     Authorize.jwt_required()
-    #     id_from_token = Authorize.get_jwt_subject()
-    #     company_id = CompanyTable.check_token_permission(id_from_token)
-    #
-    #     CompanyTable.delete(company_id)
-    #
-    #     response = JSONResponse(
-    #             content="Company successfully deleted!",
-    #             status_code=status.HTTP_200_OK
-    #         )
-    #     return response
+
+    @staticmethod
+    def delete(manager_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        ManagerTable.check_token_permission(manager_id=manager_id, id_from_token=id_from_token)
+
+        ManagerTable.delete(manager_id=manager_id)
+
+        # Response
+        response = JSONResponse(
+            content="CV successfully deleted!",
+            status_code=status.HTTP_200_OK
+        )
+        return response

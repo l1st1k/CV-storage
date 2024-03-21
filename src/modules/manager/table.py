@@ -87,9 +87,9 @@ class ManagerTable(Base, TableMixin):
                 if value:
                     setattr(row, field, value)
 
-    # @classmethod
-    # def delete(cls, cv_id: str) -> None:
-    #     with cls.session_manager() as session:
-    #         cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
-    #         check_for_404(cv_row, "No CV with such ID")
-    #         session.delete(cv_row)
+    @classmethod
+    def delete(cls, manager_id: str) -> None:
+        with cls.session_manager() as session:
+            row: Type[ManagerTable] = session.query(cls).filter_by(manager_id=uuid.UUID(manager_id)).first()
+            check_for_404(row, "No manager with such ID")
+            session.delete(row)
