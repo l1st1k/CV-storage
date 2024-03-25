@@ -9,7 +9,7 @@ from modules.manager.services import create_manager_model, get_updated_manager_m
 from modules.manager.table import ManagerTable
 
 
-class ManagerRepository:  # Todo test: list, get, post, update, delete
+class ManagerRepository:
     @staticmethod
     def list(Authorize: AuthJWT = Depends()) -> ManagersRead:
         Authorize.jwt_required()

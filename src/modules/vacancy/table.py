@@ -68,14 +68,6 @@ class VacancyTable(Base, TableMixin):
     #         return CVFullRead(**cls.to_dict(row))
     #
     # @classmethod
-    # def get_updated_model(cls, cv_id: str, data: CVUpdate) -> CVFullRead:
-    #     model: CVFullRead = cls.retrieve(cv_id)
-    #     updated_fields = data.dict(exclude_none=True)
-    #     updated_model = model.copy(update=updated_fields)
-    #
-    #     return updated_model
-    #
-    # @classmethod
     # def update(cls, model: CVInsertIntoDB) -> CVFullRead:
     #     with cls.session_manager() as session:
     #         row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(model.cv_id)).first()

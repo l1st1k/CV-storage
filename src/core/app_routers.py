@@ -13,7 +13,7 @@ routers = [
     CompanyRouter,
     CVRouter,
     ManagerRouter,
-    # VacancyRouter,  # TODO enable routers
+    VacancyRouter,
 ]
 
 
