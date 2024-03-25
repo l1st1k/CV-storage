@@ -4,7 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from core.services_general import get_uuid
 from modules.company.table import CompanyTable
-from modules.vacancy.models import VacanciesRead
+from modules.vacancy.models import VacanciesRead, VacancyCreate, VacancyInsertAndFullRead
 from modules.vacancy.table import VacancyTable
 
 
@@ -40,23 +40,30 @@ class VacancyRepository:
     #
     #     return vacancy
     #
-    # @staticmethod
-    # def create(data: VacancyCreate, Authorize: AuthJWT = Depends()) -> JSONResponse:
-    #     """Creates vacancy and returns its id"""
-    #     Authorize.jwt_required()
-    #     id_from_token = Authorize.get_jwt_subject()
-    #
-    #     # Getting company_id
-    #     company_id = get_company_id(id_from_token=id_from_token)
-    #
-    #     # Creating model
-    #     model = VacancyInsertAndFullRead(
-    #         vacancy_id=get_uuid(),
-    #         company_id=company_id,
-    #         major=data.major,
-    #         years_of_exp=data.years_of_exp,
-    #         skills=data.skills
-    #     )
+    @staticmethod
+    def create(data: VacancyCreate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = VacancyTable.check_token_permission(
+            id_from_token=id_from_token,
+            item_specific=False
+        )
+
+        model = VacancyInsertAndFullRead(
+            **data.dict(),
+            company_id=company_id,
+            vacancy_id=get_uuid()
+        )
+        VacancyTable.create(model)
+
+        response = JSONResponse(
+            content={
+                "message": f"New vacancy registered successfully!",
+                "company_id": model.company_id,
+                "vacancy_id": model.vacancy_id,
+            },
+            status_code=status.HTTP_201_CREATED)
+        return response
     #
     #     # Database logic
     #     vacancy_table.put_item(Item=dict(model))
@@ -75,7 +82,7 @@ class VacancyRepository:
     #     return response
     #
     # @staticmethod
-    # def update(vacancy_id: str, new_model: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
+    # def update(vacancy_id: str, data: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
     #     Authorize.jwt_required()
     #     id_from_token = Authorize.get_jwt_subject()
     #

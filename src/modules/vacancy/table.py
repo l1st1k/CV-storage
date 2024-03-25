@@ -50,14 +50,14 @@ class VacancyTable(Base, TableMixin):
                     raise NO_PERMISSION_EXCEPTION
 
             return str(company.company_id)
-    #
-    # @classmethod
-    # def create(cls, model: CVInsertIntoDB) -> Optional[str]:
-    #     with cls.session_manager() as session:
-    #         obj = cls.from_model(model)
-    #         session.add(obj)
-    #
-    #         return model.cv_id
+
+    @classmethod
+    def create(cls, model: VacancyInsertAndFullRead) -> Optional[str]:
+        with cls.session_manager() as session:
+            obj = cls.from_model(model)
+            session.add(obj)
+
+            return model.vacancy_id
     #
     # @classmethod
     # def retrieve(cls, cv_id: str) -> CVFullRead:
