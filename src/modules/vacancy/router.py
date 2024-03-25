@@ -14,7 +14,7 @@ class VacancyRouter:
 
     def configure_routes(self):
         self.app.get("/vacancies", response_model=VacanciesRead, tags=self.tags)(self.list_vacancies)
-        # self.app.get("/vacancy/{vacancy_id}", response_model=VacancyInsertAndFullRead, tags=self.tags)(self.get_vacancy)
+        self.app.get("/vacancy/{vacancy_id}", response_model=VacancyInsertAndFullRead, tags=self.tags)(self.get_vacancy)
         self.app.post("/vacancy", response_class=JSONResponse, tags=self.tags)(self.add_vacancy)
         # self.app.patch("/vacancy/{vacancy_id}", response_class=JSONResponse, tags=self.tags)(self.update_vacancy)
         # self.app.delete("/vacancy/{vacancy_id}", response_class=JSONResponse, tags=self.tags)(self.delete_vacancy)
@@ -25,7 +25,7 @@ class VacancyRouter:
 
     @staticmethod
     async def get_vacancy(vacancy_id: str, Authorize: AuthJWT = Depends()) -> VacancyInsertAndFullRead:
-        return VacancyRepository.get(vacancy_id_from_user=vacancy_id, Authorize=Authorize)
+        return VacancyRepository.get(vacancy_id=vacancy_id, Authorize=Authorize)
 
     @staticmethod
     async def add_vacancy(data: VacancyCreate, Authorize: AuthJWT = Depends()) -> JSONResponse:

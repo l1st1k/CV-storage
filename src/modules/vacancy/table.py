@@ -58,15 +58,15 @@ class VacancyTable(Base, TableMixin):
             session.add(obj)
 
             return model.vacancy_id
-    #
-    # @classmethod
-    # def retrieve(cls, cv_id: str) -> CVFullRead:
-    #     with cls.session_manager() as session:
-    #         row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
-    #         check_for_404(row, "No CV with such ID")
-    #
-    #         return CVFullRead(**cls.to_dict(row))
-    #
+
+    @classmethod
+    def retrieve(cls, vacancy_id: str) -> VacancyInsertAndFullRead:
+        with cls.session_manager() as session:
+            row: Type[VacancyTable] = session.query(cls).filter_by(vacancy_id=uuid.UUID(vacancy_id)).first()
+            check_for_404(row, "No vacancy with such ID")
+
+            return VacancyInsertAndFullRead(**cls.to_dict(row))
+
     # @classmethod
     # def update(cls, model: CVInsertIntoDB) -> CVFullRead:
     #     with cls.session_manager() as session:
