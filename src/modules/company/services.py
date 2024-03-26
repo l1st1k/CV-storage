@@ -23,11 +23,14 @@ def check_photo_type(photo: UploadFile) -> None:
 
 
 def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -> CompanyInsertAndFullRead:
-    # Type check
-    check_photo_type(photo)
+    if photo:
+        # Type check
+        check_photo_type(photo)
 
-    # Photo into base 64
-    encoded_string: bytes = b64encode(photo.file.read())
+        # Photo into base 64
+        encoded_string: bytes = b64encode(photo.file.read())
+    else:
+        encoded_string: None = None
 
     # Generate unique salt and hash the password
     hashed_password, salt = hash_password(credentials.password)

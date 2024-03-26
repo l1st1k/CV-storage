@@ -29,7 +29,7 @@ class CompanyRepository:
         return company
 
     @staticmethod
-    def create(name: str, credentials: AuthModel, photo: UploadFile) -> JSONResponse:
+    def create(name: str, credentials: AuthModel, photo: UploadFile = None) -> JSONResponse:
         """Creates company and returns its id"""
         model: CompanyInsertAndFullRead = create_company_model(name, credentials, photo)
         CompanyTable.create(model)
