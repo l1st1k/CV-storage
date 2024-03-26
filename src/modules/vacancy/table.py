@@ -67,16 +67,18 @@ class VacancyTable(Base, TableMixin):
 
             return VacancyInsertAndFullRead(**cls.to_dict(row))
 
-    # @classmethod
-    # def update(cls, model: CVInsertIntoDB) -> CVFullRead:
-    #     with cls.session_manager() as session:
-    #         row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(model.cv_id)).first()
-    #         check_for_404(row, "No CV with such ID")
-    #         for field, value in model.dict(exclude={'cv_id'}).items():
-    #             setattr(row, field, value)
-    #
-    #         return CVFullRead(**cls.to_dict(row))
-    #
+    @classmethod
+    def update(cls, attrs: dict) -> None:
+        with cls.session_manager() as session:
+            row: Type[VacancyTable] = session.query(cls).filter_by(
+                vacancy_id=uuid.UUID(attrs.get("vacancy_id"))
+            ).first()
+            check_for_404(row, "No vacancy with such ID")
+            attrs.pop("vacancy_id")
+            for field, value in attrs.items():
+                if value:
+                    setattr(row, field, value)
+
     @classmethod
     def delete(cls, vacancy_id: str) -> None:
         with cls.session_manager() as session:

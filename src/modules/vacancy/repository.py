@@ -61,8 +61,27 @@ class VacancyRepository:  # todo test: update, delete
         return response
 
     @staticmethod
-    def update(vacancy_id: str, data: VacancyUpdate, Authorize: AuthJWT = Depends()) -> JSONResponse:
-        pass
+    def update(
+            vacancy_id: str, 
+            data: VacancyUpdate, 
+            Authorize: AuthJWT = Depends()
+    ) -> JSONResponse:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id = VacancyTable.check_token_permission(
+            vacancy_id=vacancy_id,
+            id_from_token=id_from_token
+        )
+
+        attrs: dict = data.dict()
+        attrs.update({'company_id': company_id, 'vacancy_id': vacancy_id})
+        VacancyTable.update(attrs)
+
+        response = JSONResponse(
+            content="Vacancy successfully updated!",
+            status_code=status.HTTP_200_OK
+        )
+        return response
 
     @staticmethod
     def delete(vacancy_id: str, Authorize: AuthJWT = Depends()) -> JSONResponse:
