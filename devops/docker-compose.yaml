@@ -8,6 +8,8 @@ services:
         dockerfile: Dockerfile-FastAPI
     ports:
       - "8000:8000"
+    volumes:
+      - ../src:/app
     env_file:
       - ../src/.env
     environment:
