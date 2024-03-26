@@ -2,7 +2,6 @@ from dotenv import dotenv_values
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
-
 __all__ = (
     'AUTH_KEY',
     'POSTGRES_USER',

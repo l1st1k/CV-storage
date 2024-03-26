@@ -1,8 +1,8 @@
-from fastapi import Query, UploadFile, Depends
+from fastapi import Depends, Query, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from modules.cv.models import CVsRead, CVFullRead, CVsFullRead, CVUpdate
+from modules.cv.models import CVFullRead, CVsFullRead, CVsRead, CVUpdate
 from modules.cv.repository import CVRepository
 
 

@@ -2,8 +2,8 @@ from fastapi import FastAPI
 
 from core.app_handlers import configure_app_handlers
 from core.app_integrations import configure_app_integrations
-from core.app_routers import configure_app_routes
 from core.app_middlewares import configure_app_middlewares
+from core.app_routers import configure_app_routes
 
 __all__ = (
     'get_ctx',

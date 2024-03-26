@@ -4,8 +4,10 @@ from fastapi_jwt_auth import AuthJWT
 
 from modules.auth.models import AuthModel
 from modules.company.table import CompanyTable
-from modules.manager.models import *
-from modules.manager.services import create_manager_model, get_updated_manager_model_attrs
+from modules.manager.models import (ManagerInsertAndFullRead, ManagerShortRead,
+                                    ManagersRead, ManagerUpdate)
+from modules.manager.services import (create_manager_model,
+                                      get_updated_manager_model_attrs)
 from modules.manager.table import ManagerTable
 
 

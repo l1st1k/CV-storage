@@ -1,6 +1,6 @@
 from base64 import b64encode
 
-from fastapi import UploadFile, HTTPException
+from fastapi import HTTPException, UploadFile
 
 from core.services_general import get_uuid
 from modules.auth.models import AuthModel

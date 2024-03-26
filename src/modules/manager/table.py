@@ -2,11 +2,12 @@ import logging
 import uuid
 from typing import Optional, Type
 
-from sqlalchemy import Column, String, ForeignKey, LargeBinary
+from sqlalchemy import Column, ForeignKey, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
+from core.services_general import (NO_PERMISSION_EXCEPTION, TableMixin,
+                                   check_for_404)
 from integrations.sql.sqlalchemy_base import Base
 from modules.manager.models import ManagerInsertAndFullRead, ManagerShortRead
 

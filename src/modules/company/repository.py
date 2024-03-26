@@ -5,7 +5,8 @@ from fastapi_jwt_auth import AuthJWT
 from modules.auth.models import AuthModel
 from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead, CompanyUpdate)
-from modules.company.services import create_company_model, get_updated_company_model_attrs
+from modules.company.services import (create_company_model,
+                                      get_updated_company_model_attrs)
 from modules.company.table import CompanyTable
 
 

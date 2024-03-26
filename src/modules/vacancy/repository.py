@@ -4,7 +4,8 @@ from fastapi_jwt_auth import AuthJWT
 
 from core.services_general import get_uuid
 from modules.company.table import CompanyTable
-from modules.vacancy.models import VacanciesRead, VacancyCreate, VacancyInsertAndFullRead, VacancyUpdate
+from modules.vacancy.models import (VacanciesRead, VacancyCreate,
+                                    VacancyInsertAndFullRead, VacancyUpdate)
 from modules.vacancy.table import VacancyTable
 
 

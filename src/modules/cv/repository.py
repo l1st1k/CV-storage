@@ -1,14 +1,15 @@
 import logging
 from base64 import b64encode
 
-from fastapi import HTTPException, UploadFile, status, Depends
+from fastapi import Depends, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from core.services_general import get_uuid
 from modules.company.table import CompanyTable
-from modules.cv.models import CVsFullRead, CVFullRead, CVInsertIntoDB, CVUpdate
-from modules.cv.services import b64_to_file, csv_to_model, clear_csv, model_to_csv
+from modules.cv.models import CVFullRead, CVInsertIntoDB, CVsFullRead, CVUpdate
+from modules.cv.services import (b64_to_file, clear_csv, csv_to_model,
+                                 model_to_csv)
 from modules.cv.table import CvTable
 
 

@@ -3,7 +3,8 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from modules.auth.models import AuthModel
-from modules.company.models import CompaniesRead, CompanyUpdate, CompanyShortRead
+from modules.company.models import (CompaniesRead, CompanyShortRead,
+                                    CompanyUpdate)
 from modules.company.repository import CompanyRepository
 
 

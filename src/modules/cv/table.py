@@ -1,13 +1,14 @@
 import uuid
 from typing import Optional, Type
 
-from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary
+from sqlalchemy import Column, ForeignKey, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from core.services_general import check_for_404, TableMixin, NO_PERMISSION_EXCEPTION
+from core.services_general import (NO_PERMISSION_EXCEPTION, TableMixin,
+                                   check_for_404)
 from integrations.sql.sqlalchemy_base import Base
-from modules.cv.models import CVInsertIntoDB, CVFullRead, CVUpdate
+from modules.cv.models import CVFullRead, CVInsertIntoDB, CVUpdate
 from modules.cv.services import b64_to_file
 
 

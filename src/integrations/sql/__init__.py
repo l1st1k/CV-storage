@@ -6,15 +6,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from core.config import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+from core.config import POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER
 from integrations.sql.sqlalchemy_base import Base
-
 # Don't delete imports (required for table creation process)
 # from modules.company.table import CompanyTable
 from modules.cv.table import CvTable
 from modules.manager.table import ManagerTable
 from modules.vacancy.table import VacancyTable
-
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ class SQL_Client:
 
     @classmethod
     def get_url(cls):
-        cls.sql_url = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@localhost/{POSTGRES_DB}"
+        cls.sql_url = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@localhost/{POSTGRES_DB}"  # todo host to env
 
     def __new__(cls):
         if cls._instance is None:

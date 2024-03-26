@@ -1,18 +1,20 @@
 import logging
 import uuid
-from typing import Type, List, Optional
+from typing import List, Optional, Type
 
 from fastapi import HTTPException
-from sqlalchemy import Column, String, LargeBinary
+from sqlalchemy import Column, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from core.services_general import TableMixin, check_for_404, NO_PERMISSION_EXCEPTION
+from core.services_general import (NO_PERMISSION_EXCEPTION, TableMixin,
+                                   check_for_404)
 from integrations.sql.sqlalchemy_base import Base
-from modules.company.models import CompanyInsertAndFullRead, CompaniesRead, CompanyShortRead
-from modules.cv.models import CVsFullRead, CVFullRead
-from modules.manager.models import ManagersRead, ManagerShortRead
-from modules.vacancy.models import VacancyShortRead, VacanciesRead
+from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
+                                    CompanyShortRead)
+from modules.cv.models import CVFullRead, CVsFullRead
+from modules.manager.models import ManagerShortRead, ManagersRead
+from modules.vacancy.models import VacanciesRead, VacancyShortRead
 
 logger = logging.getLogger(__name__)
 
