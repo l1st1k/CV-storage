@@ -87,7 +87,7 @@ class ManagerRepository:
 
         # Response
         response = JSONResponse(
-            content="CV successfully deleted!",
+            content="Manager successfully deleted!",
             status_code=status.HTTP_200_OK
         )
         return response

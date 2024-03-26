@@ -77,9 +77,9 @@ class VacancyTable(Base, TableMixin):
     #
     #         return CVFullRead(**cls.to_dict(row))
     #
-    # @classmethod
-    # def delete(cls, cv_id: str) -> None:
-    #     with cls.session_manager() as session:
-    #         cv_row: Type[CvTable] = session.query(cls).filter_by(cv_id=uuid.UUID(cv_id)).first()
-    #         check_for_404(cv_row, "No CV with such ID")
-    #         session.delete(cv_row)
+    @classmethod
+    def delete(cls, vacancy_id: str) -> None:
+        with cls.session_manager() as session:
+            row: Type[VacancyTable] = session.query(cls).filter_by(vacancy_id=uuid.UUID(vacancy_id)).first()
+            check_for_404(row, "No vacancy with such ID")
+            session.delete(row)
