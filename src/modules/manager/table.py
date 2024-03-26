@@ -17,7 +17,7 @@ class ManagerTable(Base, TableMixin):
 
     manager_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     company_id = Column(UUID(as_uuid=True), ForeignKey('company.company_id'), nullable=False)
-    email = Column(String(length=31), nullable=False)
+    email = Column(String(length=255), unique=True, nullable=False)
     hashed_password = Column(LargeBinary, nullable=False)
     salt = Column(LargeBinary, nullable=False)
 

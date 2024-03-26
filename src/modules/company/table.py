@@ -24,7 +24,7 @@ class CompanyTable(Base, TableMixin):
 
     company_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     company_name = Column(String(length=20), nullable=False)
-    email = Column(String(length=255), nullable=False)
+    email = Column(String(length=255), unique=True, nullable=False)
     hashed_password = Column(LargeBinary, nullable=False)
     salt = Column(LargeBinary, nullable=False)
     logo_in_bytes = Column(LargeBinary, nullable=True)

@@ -3,7 +3,9 @@ import uuid
 from contextlib import contextmanager
 from uuid import uuid4
 
+import psycopg2
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 __all__ = (
@@ -53,6 +55,12 @@ class TableMixin:
         try:
             yield session
             session.commit()
+        except IntegrityError as e:
+            if 'violates unique constraint' in str(e.orig):
+                raise HTTPException(status_code=400, detail=f"Account with such email already exists!")
+            else:
+                logging.error(e)
+                raise HTTPException(status_code=500, detail="An unexpected error occurred.")
         except Exception:
             session.rollback()
             raise
