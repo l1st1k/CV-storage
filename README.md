@@ -1,14 +1,10 @@
 # CV-storage (Backend)
 Backend project  -  **"Internal HRM system"** <br /> 
-Stack: Python, FastAPI, SQLAlchemy, PostgreSQL, JWT.
+Stack: Python, FastAPI, SQLAlchemy, PostgreSQL, JWT, Docker, Docker-compose.
 
 ## Makefile commands:
-`make db` - for database startup<br /> 
-`make web` - for web-application startup<br /> 
-`make up` - for both<br /> 
-`make stop-db` - for database stop<br /> 
-`make stop-web` - for web-application stop<br /> 
-`make stop` - for both<br /> 
+`make up`<br /> 
+`make stop`<br /> 
 
 ## Links:
 #### [Swagger endpoint](http://127.0.0.1:8000/docs) 
