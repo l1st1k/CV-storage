@@ -4,8 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from modules.auth.models import AuthModel
 from modules.auth.services import verify_password
-from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
-                                    CompanyShortRead, CompanyUpdate)
+from modules.company.models import CompanyInsertAndFullRead
 from modules.company.table import CompanyTable
 from modules.manager.models import ManagerInsertAndFullRead
 from modules.manager.table import ManagerTable

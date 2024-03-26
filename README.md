@@ -5,6 +5,7 @@ Stack: Python, FastAPI, SQLAlchemy, PostgreSQL, JWT, Docker, Docker-compose.
 ## Makefile commands:
 `make up`<br /> 
 `make stop`<br /> 
+`make upd` - for debug mode<br />
 
 ## Links:
 #### [Swagger endpoint](http://127.0.0.1:8000/docs) 
