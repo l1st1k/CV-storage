@@ -1,7 +1,27 @@
 version: '3.3'
 
 services:
-  # TODO webapp
+  web:
+    container_name: "fastapi-backend"
+    build:
+        context: .
+        dockerfile: Dockerfile-FastAPI
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../src/.env
+    environment:
+      "POSTGRES_HOST":"postgresql"
+    command:
+      - bash
+      - -c
+      - |
+        while !</dev/tcp/postgresql/5432; do sleep 1; done;
+        uvicorn main:app --host 0.0.0.0 --reload
+    networks:
+      - diploma
+    depends_on:
+      - postgresql
 
   postgresql:
     container_name: "postgresql"
@@ -12,6 +32,12 @@ services:
       - ../src/.env
     ports:
       - "5432:5432"
-
+    networks:
+      - diploma
+  
 volumes:
   postgres_data:
+
+networks:
+  diploma:
+    driver: bridge
