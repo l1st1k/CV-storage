@@ -116,6 +116,7 @@ class CVRepository:
 
     @staticmethod
     def get_csv(cv_id: str, Authorize: AuthJWT = Depends()) -> FileResponse:
+        #  Todo decide, whether we should store b64 of csv or no (most likely no)
         Authorize.jwt_required()
         id_from_token = Authorize.get_jwt_subject()
         CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)

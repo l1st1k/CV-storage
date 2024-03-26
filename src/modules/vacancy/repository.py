@@ -9,7 +9,7 @@ from modules.vacancy.models import (VacanciesRead, VacancyCreate,
 from modules.vacancy.table import VacancyTable
 
 
-class VacancyRepository:  # todo test: update, delete
+class VacancyRepository:
     @staticmethod
     def list(Authorize: AuthJWT = Depends()) -> VacanciesRead:
         Authorize.jwt_required()
