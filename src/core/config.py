@@ -8,6 +8,7 @@ __all__ = (
     'POSTGRES_PASSWORD',
     'POSTGRES_DB',
     'POSTGRES_HOST',
+    'TOKEN_MINUTES_TO_LIVE',
 )
 
 # Env variables
@@ -21,6 +22,7 @@ POSTGRES_USER = config["POSTGRES_USER"]
 POSTGRES_PASSWORD = config["POSTGRES_PASSWORD"]
 POSTGRES_DB = config["POSTGRES_DB"]
 POSTGRES_HOST = config["POSTGRES_HOST"]
+TOKEN_MINUTES_TO_LIVE = int(config["TOKEN_MINUTES_TO_LIVE"])
 
 
 class Settings(BaseModel):

@@ -116,7 +116,6 @@ class CVRepository:
 
     @staticmethod
     def get_csv(cv_id: str, Authorize: AuthJWT = Depends()) -> FileResponse:
-        #  Todo decide, whether we should store b64 of csv or no (most likely no)
         Authorize.jwt_required()
         id_from_token = Authorize.get_jwt_subject()
         CvTable.check_token_permission(cv_id=cv_id, id_from_token=id_from_token)
@@ -156,7 +155,6 @@ class CVRepository:
         list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
 
         # Filtering
-        # TODO investigate if fastapi_filters is suitable here
         result = [
             item for item in list_of_cvs
             if all(

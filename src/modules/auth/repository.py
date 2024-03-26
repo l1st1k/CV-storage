@@ -1,7 +1,10 @@
+import datetime
+
 from fastapi import Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
+from core.config import TOKEN_MINUTES_TO_LIVE
 from modules.auth.models import AuthModel
 from modules.auth.services import verify_password
 from modules.company.models import CompanyInsertAndFullRead
@@ -11,8 +14,11 @@ from modules.manager.table import ManagerTable
 
 
 class AuthRepository:
-    @staticmethod
+    token_ttl = datetime.timedelta(minutes=TOKEN_MINUTES_TO_LIVE)
+
+    @classmethod
     def login(
+            cls,
             credentials: AuthModel,
             as_company: bool,
             Authorize: AuthJWT = Depends()
@@ -31,8 +37,8 @@ class AuthRepository:
             raise HTTPException(status_code=401, detail="Bad username or password")
 
         # Generating tokens
-        access_token = Authorize.create_access_token(subject=obj.company_id, expires_time=False)  # TODO set exp_time
-        refresh_token = Authorize.create_refresh_token(subject=obj.company_id, expires_time=False)
+        access_token = Authorize.create_access_token(subject=obj.company_id, expires_time=cls.token_ttl)
+        refresh_token = Authorize.create_refresh_token(subject=obj.company_id, expires_time=cls.token_ttl)
         response = JSONResponse(
             content={
                 "message": "JWT tokens are placed in HTTP-Only cookies successfully!",
@@ -46,11 +52,11 @@ class AuthRepository:
 
         return response
 
-    @staticmethod
-    def refresh(Authorize: AuthJWT = Depends()):
+    @classmethod
+    def refresh(cls, Authorize: AuthJWT = Depends()):
         Authorize.jwt_refresh_token_required()
         id_from_token = Authorize.get_jwt_subject()
-        new_access_token = Authorize.create_access_token(subject=id_from_token)
+        new_access_token = Authorize.create_access_token(subject=id_from_token, expires_time=cls.token_ttl)
 
         response = JSONResponse(
             content={
