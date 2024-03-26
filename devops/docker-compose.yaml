@@ -12,8 +12,6 @@ services:
       - ../src:/app
     env_file:
       - ../src/.env
-    environment:
-      - POSTGRES_HOST=postgresql
     command:
       - bash
       - -c
