@@ -7,6 +7,7 @@ __all__ = (
     'POSTGRES_USER',
     'POSTGRES_PASSWORD',
     'POSTGRES_DB',
+    'POSTGRES_HOST',
 )
 
 # Env variables
@@ -19,6 +20,7 @@ AUTH_KEY = config["AUTH_KEY"]
 POSTGRES_USER = config["POSTGRES_USER"]
 POSTGRES_PASSWORD = config["POSTGRES_PASSWORD"]
 POSTGRES_DB = config["POSTGRES_DB"]
+POSTGRES_HOST = config["POSTGRES_HOST"]
 
 
 class Settings(BaseModel):
