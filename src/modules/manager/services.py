@@ -1,3 +1,6 @@
+from fastapi import HTTPException
+from pydantic import ValidationError
+
 from core.services_general import get_uuid
 from modules.auth.models import AuthModel
 from modules.auth.services import hash_password
@@ -13,13 +16,18 @@ def create_manager_model(company_id: str, credentials: AuthModel) -> ManagerInse
     # Generate unique salt and hash the password
     hashed_password, salt = hash_password(credentials.password)
 
-    return ManagerInsertAndFullRead(
-        manager_id=get_uuid(),
-        company_id=company_id,
-        email=credentials.login,
-        hashed_password=hashed_password,
-        salt=salt
-    )
+    try:
+        model = ManagerInsertAndFullRead(
+            manager_id=get_uuid(),
+            company_id=company_id,
+            email=credentials.login,
+            hashed_password=hashed_password,
+            salt=salt
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=e)
+
+    return model
 
 
 def get_updated_manager_model_attrs(model: ManagerUpdate) -> dict:

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 __all__ = (
     'ManagerUpdate',
@@ -40,7 +40,7 @@ class ManagerFields:
 
 class ManagerUpdate(BaseModel):
     """Body of Manager PATCH requests"""
-    email: Optional[str] = ManagerFields.email
+    email: Optional[EmailStr] = ManagerFields.email
     new_password: Optional[str] = ManagerFields.new_password
 
 
@@ -48,7 +48,7 @@ class ManagerInsertAndFullRead(BaseModel):
     """Model to insert into database and full read case"""
     manager_id: str = ManagerFields.manager_id
     company_id: str = ManagerFields.company_id
-    email: str = ManagerFields.email
+    email: EmailStr = ManagerFields.email
     hashed_password: bytes = ManagerFields.hashed_password
     salt: bytes = ManagerFields.salt
 
@@ -57,7 +57,7 @@ class ManagerShortRead(BaseModel):
     """Model for reading without credentials"""
     manager_id: str = ManagerFields.manager_id
     company_id: str = ManagerFields.company_id
-    email: str = ManagerFields.email
+    email: EmailStr = ManagerFields.email
 
 
 ManagersRead = List[ManagerShortRead]

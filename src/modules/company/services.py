@@ -1,6 +1,7 @@
 from base64 import b64encode
 
 from fastapi import HTTPException, UploadFile
+from pydantic import ValidationError
 
 from core.services_general import get_uuid
 from modules.auth.models import AuthModel
@@ -35,14 +36,19 @@ def create_company_model(name: str, credentials: AuthModel, photo: UploadFile) -
     # Generate unique salt and hash the password
     hashed_password, salt = hash_password(credentials.password)
 
-    return CompanyInsertAndFullRead(
-        company_id=get_uuid(),
-        email=credentials.login,
-        hashed_password=hashed_password,
-        salt=salt,
-        company_name=name,
-        logo_in_bytes=encoded_string,
-    )
+    try:
+        model = CompanyInsertAndFullRead(
+            company_id=get_uuid(),
+            email=credentials.login,
+            hashed_password=hashed_password,
+            salt=salt,
+            company_name=name,
+            logo_in_bytes=encoded_string,
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=e)
+
+    return model
 
 
 def get_updated_company_model_attrs(model: CompanyUpdate) -> dict:
