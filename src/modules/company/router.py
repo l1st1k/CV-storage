@@ -17,7 +17,7 @@ class CompanyRouter:
     def configure_routes(self):
         self.app.get("/companies", response_model=CompaniesRead, tags=("AdminOnly",))(self.list_companies)
         self.app.get("/company", response_model=CompanyShortRead, tags=self.tags)(self.get_company)
-        self.app.post("/register_company", response_class=JSONResponse, tags=self.tags)(self.register_company)
+        self.app.post("/company", response_class=JSONResponse, tags=self.tags)(self.register_company)
         self.app.patch("/company", response_class=JSONResponse, tags=self.tags)(self.update_company)
         self.app.delete("/company", response_class=JSONResponse, tags=self.tags)(self.delete_company)
 
