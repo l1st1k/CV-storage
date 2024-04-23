@@ -39,7 +39,7 @@ def configure_app_middlewares(application: FastAPI) -> None:
     @application.middleware("http")
     async def cookie_logger(request, call_next):
         origin: str = request.headers.get('referer')
-        same_port: bool = ":8000" in origin
+        same_port: bool = ":8000" in origin if origin else True
 
         # IN-BOUND
         if same_port:

@@ -59,8 +59,13 @@ def b64_to_file(b64_str: bytes, title: str = 'temp.csv') -> str:
     # Decoding base64
     image_64_decode = base64.b64decode(b64_str)
 
+    # Ensure the directory exists
+    directory = "tmp/"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     # Creates a writable image and writes the decoded result
-    title = "tmp/" + title
+    title = directory + title
     image_result = open(title, 'wb')
     image_result.write(image_64_decode)
 
