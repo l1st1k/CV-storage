@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from fastapi import Depends, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -49,6 +50,7 @@ class AuthRepository:
         )
         Authorize.set_access_cookies(access_token, response=response)
         Authorize.set_refresh_cookies(refresh_token, response=response)
+        response.set_cookie("auth_str", str(uuid.uuid4()))
 
         return response
 
@@ -77,5 +79,6 @@ class AuthRepository:
             status_code=status.HTTP_200_OK
         )
         Authorize.unset_jwt_cookies(response=response)
+        response.delete_cookie("auth_str")
 
         return response

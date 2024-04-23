@@ -2,6 +2,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 __all__ = ('configure_app_middlewares',)
 
@@ -28,5 +29,9 @@ def configure_app_middlewares(application: FastAPI) -> None:
         response = await call_next(request)
         response_cookies = response.headers.getlist('set-cookie')
         logger.info(f"Response Cookies: {response_cookies}")
+        if response_cookies:
+            response = JSONResponse(content={"cookies": response_cookies})
 
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
         return response
