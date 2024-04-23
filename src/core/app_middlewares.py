@@ -38,14 +38,23 @@ def configure_app_middlewares(application: FastAPI) -> None:
 
     @application.middleware("http")
     async def cookie_logger(request, call_next):
-        custom_request = CustomRequest(request.scope)
-        custom_request.set_cookies_from_header()
-        logger.info(f"Request Cookies: {custom_request.cookies}")
+        origin: str = request.headers.get('referer')
+        same_port: bool = ":8000" in origin
 
-        response = await call_next(custom_request)
+        # IN-BOUND
+        if same_port:
+            logger.info(f"Request Cookies: {request.cookies}")
+            response = await call_next(request)
+        else:
+            custom_request = CustomRequest(request.scope)
+            custom_request.set_cookies_from_header()
+            logger.info(f"Request Cookies: {custom_request.cookies}")
+            response = await call_next(custom_request)
+
+        # OUT-BOUND
         response_cookies = response.headers.getlist('set-cookie')
         logger.info(f"Response Cookies: {response_cookies}")
-        if response_cookies:
+        if response_cookies and not same_port:
             response = JSONResponse(content={"cookies": response_cookies})
 
         response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
