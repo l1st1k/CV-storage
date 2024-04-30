@@ -19,7 +19,8 @@ class CustomRequest(Request):
             # Assuming the value is a simple string; you may need to parse if it's formatted differently
             mutable_headers = MutableHeaders(raw=self.scope['headers'])
             for cookie in cookie_value.split(" "):
-                mutable_headers.append('cookie', cookie)
+                if cookie[:8] in 'access_token_cookie, refresh_token_cookie, auth_str':
+                    mutable_headers.append('cookie', cookie)
 
 
 def configure_app_middlewares(application: FastAPI) -> None:

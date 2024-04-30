@@ -47,7 +47,7 @@ class VacancyUpdate(BaseModel):
 class VacancyCreate(VacancyUpdate):
     major: str = VacancyFields.major
     years_of_exp: int = VacancyFields.years_of_exp
-    skills: Optional[str] = VacancyFields.skills
+    skills: str = VacancyFields.skills
 
 
 class VacancyShortRead(BaseModel):
@@ -57,8 +57,8 @@ class VacancyShortRead(BaseModel):
     years_of_exp: int = VacancyFields.years_of_exp
 
 
-VacanciesRead = List[VacancyShortRead]
-
-
 class VacancyInsertAndFullRead(VacancyShortRead):
-    skills: Optional[str] = VacancyFields.skills
+    skills: str = VacancyFields.skills
+
+
+VacanciesRead = List[VacancyInsertAndFullRead]

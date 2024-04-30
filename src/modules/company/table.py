@@ -14,7 +14,7 @@ from modules.company.models import (CompaniesRead, CompanyInsertAndFullRead,
                                     CompanyShortRead)
 from modules.cv.models import CVFullRead, CVsFullRead
 from modules.manager.models import ManagerShortRead, ManagersRead
-from modules.vacancy.models import VacanciesRead, VacancyShortRead
+from modules.vacancy.models import VacanciesRead, VacancyInsertAndFullRead
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class CompanyTable(Base, TableMixin):
             row: Type[CompanyTable] = session.query(cls).filter_by(company_id=uuid.UUID(company_id)).first()
             check_for_404(row, "No company with such ID")
             check_for_404(row.vacancies, "No vacancies in a company")
-            return [VacancyShortRead(**cls.to_dict(document)) for document in row.vacancies]
+            return [VacancyInsertAndFullRead(**cls.to_dict(document)) for document in row.vacancies]
 
     @classmethod
     def get_company_by_token_id(cls, id_from_token: str, return_model: bool = False):
