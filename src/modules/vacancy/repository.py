@@ -4,6 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from core.services_general import get_uuid
 from modules.company.table import CompanyTable
+from modules.cv.models import CVsFullRead, CVFullRead
 from modules.vacancy.models import (VacanciesRead, VacancyCreate,
                                     VacancyInsertAndFullRead, VacancyUpdate)
 from modules.vacancy.table import VacancyTable
@@ -98,3 +99,37 @@ class VacancyRepository:
             status_code=status.HTTP_200_OK
         )
         return response
+
+    @staticmethod
+    def get_top_cvs(vacancy_id: str, Authorize: AuthJWT = Depends()) -> CVsFullRead:
+        Authorize.jwt_required()
+        id_from_token = Authorize.get_jwt_subject()
+        company_id: str = VacancyTable.check_token_permission(
+            vacancy_id=vacancy_id,
+            id_from_token=id_from_token
+        )
+        list_of_cvs: CVsFullRead = CompanyTable.get_cvs(company_id=company_id)
+        vacancy: VacancyInsertAndFullRead = VacancyTable.retrieve(vacancy_id=vacancy_id)
+
+        def cv_score(cv: CVFullRead) -> int:
+            score = 0
+            cv_skills_set = set(cv.skills.lower().split(','))
+            vacancy_skills_set = set(vacancy.skills.lower().split(','))
+
+            if cv.major.lower() == vacancy.major.lower():
+                score += 10
+            if cv.years_of_exp >= vacancy.years_of_exp:
+                score += 10 + (cv.years_of_exp - vacancy.years_of_exp)
+            shared_skills = cv_skills_set.intersection(vacancy_skills_set)
+            score += 2 * len(shared_skills)
+            print(cv.last_name, score)
+            return score
+
+        # Additional filtration
+        # filtered_cvs = [cv for cv in list_of_cvs if
+        #                 cv.major == vacancy.major and cv.years_of_exp >= vacancy.years_of_exp]
+
+        sorted_cvs = sorted(list_of_cvs, key=cv_score, reverse=True)
+        top_cvs = sorted_cvs[:3]
+
+        return top_cvs
